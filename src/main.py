@@ -11,7 +11,10 @@ from pretrain import extract_features, syntax_check
 #     print("I don't understand {} did you mean one of these? {}".format(word, ', '.join(similarities)))
 
 
-
+# Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk
+# (tipo articoli, preposizioni)
+# (l'unico contenuto informativo potrebbero darlo le congiunzioni tipo "and" che possono servire ad identificare
+# la presenza di più task)
 # Per più task, per determinare l'ordine si fa pos tagging per estrarre le piu frasi in un solo prompt
 while True:
   prompt: str = input(">> ")
