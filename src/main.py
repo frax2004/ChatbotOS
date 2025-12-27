@@ -32,8 +32,9 @@ while True:
 
   #prova di check_keyword_for_sentence
   sentence_tokens = SplitTokenizer.tokenize(prompt)
-  check_list = pt.check_keywords_for_sentence(sentence_tokens)
+  check_list = pt.check_sentence_for_non_keywords(sentence_tokens)
   print(check_list)
+
 
 
 

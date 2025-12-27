@@ -8,12 +8,12 @@ def check_keywords(word: str):
   
   return (word, False)
 
-def check_keywords_for_sentence(sentence: list[str]):
+def check_sentence_for_non_keywords(sentence: list[str]):
   check_list: list[tuple[str, bool]] = []
   for word in sentence:
     check_list.append(check_keywords(word))
   
-  return check_list
+  return [t[0] for t in check_list if t[1]==False]
 
 def extract_features(sentence: list[str]) -> dict[str: bool]:
   def extract_feature(word: str) -> dict[str: bool]:
