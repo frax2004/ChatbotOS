@@ -25,8 +25,10 @@ def syntax_check(sentence: list[str]) -> None:
     frequencies: list[tuple[str: int]] = []
     for tag, keywords in Datasets.KEYWORDS.items():
       sims: list[tuple] = [(w, edit_distance(word, w)) for w in keywords]
+      #per ogni parola, prendiamo il tag corrispondente alle keywords con maggiore frequenza
+      #dove la misura di frequenza è data da edit_distance < THRESHOLD e > 0
       similarities = list(filter(lambda pair: pair[1] < THRESHOLD and pair[1] > 0, sims))
       frequencies.append((tag, len(similarities)))
 
     pair: tuple[str, int] = max(frequencies, key = lambda pair: pair[1])
-    print("I don't understand {} did you mean {}?".format(word, pair[0].lower()))
+    print("I don't understand \033[1m{}\033[0m did you mean \033[1m{}\033[0m?".format(word, pair[0].lower()))
