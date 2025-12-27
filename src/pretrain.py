@@ -1,6 +1,20 @@
 from datasets import Datasets
 from nltk.metrics import edit_distance
 
+def check_keywords(word: str):
+  for (tag, items) in Datasets.KEYWORDS.items():
+    if word in items:
+      return (word, True)
+  
+  return (word, False)
+
+def check_keywords_for_sentence(sentence: list[str]):
+  check_list: list[tuple[str, bool]] = []
+  for word in sentence:
+    check_list.append(check_keywords(word))
+  
+  return check_list
+
 def extract_features(sentence: list[str]) -> dict[str: bool]:
   def extract_feature(word: str) -> dict[str: bool]:
     return { 

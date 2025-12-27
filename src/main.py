@@ -1,5 +1,5 @@
 from tokenizers import SplitTokenizer
-from pretrain import extract_features, syntax_check
+import pretrain as pt
 
 # def syntax_check(sentence: list[str]) -> None:
 #   for word in sentence:
@@ -19,16 +19,21 @@ from pretrain import extract_features, syntax_check
 while True:
   prompt: str = input(">> ")
 
-  def print_features(prompt: str):
-    sentence_tokens = SplitTokenizer.tokenize(prompt)
-    syntax_check(sentence_tokens)
+  # def print_features(prompt: str):
+  #   sentence_tokens = SplitTokenizer.tokenize(prompt)
+  #   syntax_check(sentence_tokens)
 
-    features = extract_features(sentence_tokens)
-    print(sentence_tokens)
-    for (feature, is_present) in features.items():
-      print(feature, is_present)
+  #   features = extract_features(sentence_tokens)
+  #   print(sentence_tokens)
+  #   for (feature, is_present) in features.items():
+  #     print(feature, is_present)
 
-  print_features(prompt)
+  #print_features(prompt)
+
+  #prova di check_keyword_for_sentence
+  sentence_tokens = SplitTokenizer.tokenize(prompt)
+  check_list = pt.check_keywords_for_sentence(sentence_tokens)
+  print(check_list)
 
 
 
