@@ -1,7 +1,7 @@
 import json
 from itertools import chain
 
-KEYWORDS: dict[str: list[str]] = {
+KEYWORDS: dict[str, list[str]] = {
   'RENAME': [
     'rename', 'renaming', 'renamed',
     'change', 'changing', 'changed',
@@ -73,7 +73,7 @@ KEYWORDS: dict[str: list[str]] = {
 }
 
 
-RENAME_KEYWORDS: tuple[str] = (
+RENAME_KEYWORDS: tuple = (
   'rename', 'renaming', 'renamed',
   'change', 'changing', 'changed',
   'modify', 'modifying', 'modified',
@@ -84,21 +84,21 @@ RENAME_KEYWORDS: tuple[str] = (
   'retitle', 'retitled'
 )
 
-CREATE_KEYWORDS: tuple[str] = (
+CREATE_KEYWORDS: tuple = (
   'create', 'make', 'generate', 'build', 'construct', 'spawn', 'produce', 
   'initiate', 'setup', 'instantiate', 'touch', 'mkdir', 'mkfile', 'md', 
   'new', 'add', 'addition', 'start', 'write', 'launch', 'establish', 
   'form', 'compose', 'allocate'
 )
 
-DIRECTORY_KEYWORDS: tuple[str] = (
+DIRECTORY_KEYWORDS: tuple = (
   'directory', 'folder', 'path', 'subdir', 'subdirectory', 'dir', 
   'mkdir', 'md', 'cd', 'ls', 'pwd', 'tree', 'location', 'root', 
   'home', 'destination', 'source', 'mount', 'volume', 'pathname',
   'folderpath', 'filepath'
 )
 
-FILE_KEYWORDS: tuple[str] = (
+FILE_KEYWORDS: tuple = (
   'file', 'files', 'filename', 'document', 'doc', 'docs', 'text', 'txt',
   'script', 'log', 'logs', 'image', 'img', 'photo', 'data', 'pdf', 
   'archive', 'zip', 'item', 'object', 'attachment', 'extension', 'ext',
@@ -106,14 +106,14 @@ FILE_KEYWORDS: tuple[str] = (
   'filepath', 'basename'
 )
 
-DELETE_KEYWORDS: tuple[str] = (
+DELETE_KEYWORDS: tuple = (
   'delete', 'remove', 'erase', 'destroy', 'kill', 'purge', 'rm', 'del',
   'rmdir', 'wipe', 'clear', 'trash', 'discard', 'terminate', 'eliminate',
   'scrap', 'cancel', 'drop', 'unlink', 'expunge', 'cleanup', 'clean',
   'obliterate', 'uninstall', 'bin'
 )
 
-SHOW_KEYWORDS: tuple[str] = (
+SHOW_KEYWORDS: tuple = (
   'show', 'display', 'view', 'list', 'ls', 'dir', 'cat', 'type', 'print', 
   'echo', 'read', 'see', 'reveal', 'look', 'check', 'inspect', 'examine', 
   'find', 'locate', 'grep', 'tree', 'more', 'less', 'head', 'tail', 
@@ -121,21 +121,21 @@ SHOW_KEYWORDS: tuple[str] = (
   'output', 'map', 'listout'
 )
 
-CHANGE_KEYWORDS: tuple[str] = (
+CHANGE_KEYWORDS: tuple = (
   'change', 'modify', 'alter', 'update', 'edit', 'switch', 'swap', 
   'replace', 'convert', 'set', 'reset', 'adjust', 'configure', 'tweak', 
   'toggle', 'cd', 'chmod', 'chown', 'chgrp', 'chsh', 'su', 'sudo', 
   'passwd', 'transform', 'reconfigure', 'shift', 'move'
 )
 
-COPY_KEYWORDS: tuple[str] = (
+COPY_KEYWORDS: tuple = (
   'copy', 'cp', 'scp', 'duplicate', 'replicate', 'clone', 'backup', 
   'mirror', 'xcopy', 'robocopy', 'rsync', 'reproduce', 'snapshot', 
   'sync', 'synchronize', 'transfer', 'multiply', 'reproduction', 
   'cloning', 'duplication', 'back-up'
 )
 
-MOVE_KEYWORDS: tuple[str] = (
+MOVE_KEYWORDS: tuple = (
   'move', 'mv', 'relocate', 'transfer', 'shift', 'displace', 'reposition', 
   'migrate', 'migration', 'transport', 'cut', 'paste', 'place', 'put', 
   'redirect', 'reroute', 'rearrange', 'reorganize', 'drag', 'drop', 
@@ -159,7 +159,7 @@ def categories() -> set[str]:
   }
 
 
-def tagged_commands(categs: set[str] = {'all'}) -> list[dict[str: str]]:
+def tagged_commands(categs: set[str] = {'all'}) -> list[dict[str, str]]:
 
   categs = { *map(str.lower, categs) }
   categs.intersection_update(categories())

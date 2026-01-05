@@ -10,3 +10,4 @@ class SplitTokenizer(Tokenizer):
   @staticmethod
   def tokenize(input: str):
     return input.split(' ')
+

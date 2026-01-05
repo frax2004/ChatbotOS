@@ -6,11 +6,17 @@ def split_keywords(sentence: list[str]):
   is_keyword = lambda w: w in chain(*KEYWORDS.values())
   return list((word, 'keyword' if is_keyword(word) else 'non-keyword') for word in sentence)
 
-def extract_features(sentence: list[str]) -> dict[str: bool]:
+
+def train_test_split(dataset, pivot: float = .5):
+  pivot = round(min(1, max(pivot, 0))*len(dataset))
+  return dataset[:pivot], dataset[pivot:]
+
+
+def extract_features(sentence: list[str]) -> dict[str, bool]:
   extract_features_word = lambda w: {
     tag: bool(w in keywords) for (tag, keywords) in KEYWORDS.items()
   }
-  sentence_features: dict[str: bool] = dict.fromkeys(KEYWORDS.keys(), False)
+  sentence_features: dict[str, bool] = dict.fromkeys(KEYWORDS.keys(), False)
 
   for word in sentence:
     features = extract_features_word(word)
