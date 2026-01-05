@@ -1,3 +1,5 @@
+import json
+
 
 class Datasets:
   KEYWORDS: dict[str: tuple[str]] = {
@@ -62,6 +64,8 @@ class Datasets:
       'carry', 'pathing', 'transferring'
     )
   }
+  COMMANDS = json.load(open('data/linux-command-dataset/linuxcommands.json', encoding='utf-8'))
+
 
   RENAME_KEYWORDS: tuple[str] = KEYWORDS['RENAME']
   CREATE_KEYWORDS: tuple[str] = KEYWORDS['CREATE']

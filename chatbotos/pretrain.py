@@ -1,11 +1,10 @@
-from datasets import Datasets
+from chatbotos.datasets import Datasets
 from nltk.metrics import edit_distance
 
 def check_keywords(word: str):
   for (tag, items) in Datasets.KEYWORDS.items():
     if word in items:
       return (word, True)
-  
   return (word, False)
 
 def check_sentence_for_non_keywords(sentence: list[str]):
@@ -13,7 +12,7 @@ def check_sentence_for_non_keywords(sentence: list[str]):
   for word in sentence:
     check_list.append(check_keywords(word))
   
-  return [t[0] for t in check_list if t[1]==False]
+  return check_list
 
 def extract_features(sentence: list[str]) -> dict[str: bool]:
   def extract_feature(word: str) -> dict[str: bool]:
@@ -31,18 +30,14 @@ def extract_features(sentence: list[str]) -> dict[str: bool]:
   return sentence_features
 
 
-def syntax_check(sentence: list[str]) -> None:
+def syntax_check(sentence: list[str]):
   THRESHOLD = 3
 
+  similarities = []
   for word in sentence:
-
-    frequencies: list[tuple[str: int]] = []
-    for tag, keywords in Datasets.KEYWORDS.items():
+    for _, keywords in Datasets.KEYWORDS.items():
       sims: list[tuple] = [(w, edit_distance(word, w)) for w in keywords]
-      #per ogni parola, prendiamo il tag corrispondente alle keywords con maggiore frequenza
-      #dove la misura di frequenza è data da edit_distance < THRESHOLD e > 0
-      similarities = list(filter(lambda pair: pair[1] < THRESHOLD and pair[1] > 0, sims))
-      frequencies.append((tag, len(similarities)))
+      similarities += list(filter(lambda pair: pair[1] < THRESHOLD and pair[1] > 0, sims))
 
-    pair: tuple[str, int] = max(frequencies, key = lambda pair: pair[1])
-    print("I don't understand \033[1m{}\033[0m did you mean \033[1m{}\033[0m?".format(word, pair[0].lower()))
+  return similarities
+  # print("I don't understand \033[1m{}\033[0m did you mean \033[1m{}\033[0m?".format(word, pair[0].lower()))
