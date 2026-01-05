@@ -1,102 +1,228 @@
 import json
+from itertools import chain
 
-class Datasets:
-  KEYWORDS: dict[str: tuple[str]] = {
-    'RENAME': (
-      'rename', 'renaming', 'renamed',
-      'change', 'changing', 'changed',
-      'modify', 'modifying', 'modified',
-      'update', 'updating', 'updated',
-      'alter', 'altering',
-      'replace', 'replacing',
-      'relabel', 'relabeling',
-      'retitle', 'retitled'
-    ),
-    'CREATE': (
-      'create', 'make', 'generate', 'build', 'construct', 'spawn', 'produce', 
-      'initiate', 'setup', 'instantiate', 'touch', 'mkdir', 'mkfile', 'md', 
-      'new', 'add', 'addition', 'start', 'write', 'launch', 'establish', 
-      'form', 'compose', 'allocate'
-    ),
-    'DIRECTORY': (
-      'directory', 'folder', 'path', 'subdir', 'subdirectory', 'dir', 
-      'mkdir', 'md', 'cd', 'ls', 'pwd', 'tree', 'location', 'root', 
-      'home', 'destination', 'source', 'mount', 'volume', 'pathname',
-      'folderpath', 'filepath'
-    ),
-    'FILE': (
-      'file', 'files', 'filename', 'document', 'doc', 'docs', 'text', 'txt',
-      'script', 'log', 'logs', 'image', 'img', 'photo', 'data', 'pdf', 
-      'archive', 'zip', 'item', 'object', 'attachment', 'extension', 'ext',
-      'binary', 'bin', 'executable', 'exe', 'readme', 'manifest', 'content',
-      'filepath', 'basename'
-    ),
-    'DELETE': (
-      'delete', 'remove', 'erase', 'destroy', 'kill', 'purge', 'rm', 'del',
-      'rmdir', 'wipe', 'clear', 'trash', 'discard', 'terminate', 'eliminate',
-      'scrap', 'cancel', 'drop', 'unlink', 'expunge', 'cleanup', 'clean',
-      'obliterate', 'uninstall', 'bin'
-    ),
-    'SHOW': (
-      'show', 'display', 'view', 'list', 'ls', 'dir', 'cat', 'type', 'print', 
-      'echo', 'read', 'see', 'reveal', 'look', 'check', 'inspect', 'examine', 
-      'find', 'locate', 'grep', 'tree', 'more', 'less', 'head', 'tail', 
-      'stat', 'status', 'info', 'information', 'contents', 'details', 
-      'output', 'map', 'listout'
-    ),
-    'CHANGE': (
-      'change', 'modify', 'alter', 'update', 'edit', 'switch', 'swap', 
-      'replace', 'convert', 'set', 'reset', 'adjust', 'configure', 'tweak', 
-      'toggle', 'cd', 'chmod', 'chown', 'chgrp', 'chsh', 'su', 'sudo', 
-      'passwd', 'transform', 'reconfigure', 'shift', 'move'
-    ),
-    'COPY': (
-      'copy', 'cp', 'scp', 'duplicate', 'replicate', 'clone', 'backup', 
-      'mirror', 'xcopy', 'robocopy', 'rsync', 'reproduce', 'snapshot', 
-      'sync', 'synchronize', 'transfer', 'multiply', 'reproduction', 
-      'cloning', 'duplication', 'back-up'
-    ),
-    'MOVE': (
-      'move', 'mv', 'relocate', 'transfer', 'shift', 'displace', 'reposition', 
-      'migrate', 'migration', 'transport', 'cut', 'paste', 'place', 'put', 
-      'redirect', 'reroute', 'rearrange', 'reorganize', 'drag', 'drop', 
-      'carry', 'pathing', 'transferring'
-    ),
+KEYWORDS: dict[str: list[str]] = {
+  'RENAME': [
+    'rename', 'renaming', 'renamed',
+    'change', 'changing', 'changed',
+    'modify', 'modifying', 'modified',
+    'update', 'updating', 'updated',
+    'alter', 'altering',
+    'replace', 'replacing',
+    'relabel', 'relabeling',
+    'retitle', 'retitled'
+  ],
+
+  'CREATE': [
+    'create', 'make', 'generate', 'build', 'construct', 'spawn', 'produce', 
+    'initiate', 'setup', 'instantiate', 'touch', 'mkdir', 'mkfile', 'md', 
+    'new', 'add', 'addition', 'start', 'write', 'launch', 'establish', 
+    'form', 'compose', 'allocate'
+  ],
+
+  'DIRECTORY': [
+    'directory', 'folder', 'path', 'subdir', 'subdirectory', 'dir', 
+    'mkdir', 'md', 'cd', 'ls', 'pwd', 'tree', 'location', 'root', 
+    'home', 'destination', 'source', 'mount', 'volume', 'pathname',
+    'folderpath', 'filepath'
+  ],
+
+  'FILE': [
+    'file', 'files', 'filename', 'document', 'doc', 'docs', 'text', 'txt',
+    'script', 'log', 'logs', 'image', 'img', 'photo', 'data', 'pdf', 
+    'archive', 'zip', 'item', 'object', 'attachment', 'extension', 'ext',
+    'binary', 'bin', 'executable', 'exe', 'readme', 'manifest', 'content',
+    'filepath', 'basename'
+  ],
+
+  'DELETE': [
+    'delete', 'remove', 'erase', 'destroy', 'kill', 'purge', 'rm', 'del',
+    'rmdir', 'wipe', 'clear', 'trash', 'discard', 'terminate', 'eliminate',
+    'scrap', 'cancel', 'drop', 'unlink', 'expunge', 'cleanup', 'clean',
+    'obliterate', 'uninstall', 'bin'
+  ],
+
+  'SHOW': [
+    'show', 'display', 'view', 'list', 'ls', 'dir', 'cat', 'type', 'print', 
+    'echo', 'read', 'see', 'reveal', 'look', 'check', 'inspect', 'examine', 
+    'find', 'locate', 'grep', 'tree', 'more', 'less', 'head', 'tail', 
+    'stat', 'status', 'info', 'information', 'contents', 'details', 
+    'output', 'map', 'listout'
+  ],
+
+  'CHANGE': [
+    'change', 'modify', 'alter', 'update', 'edit', 'switch', 'swap', 
+    'replace', 'convert', 'set', 'reset', 'adjust', 'configure', 'tweak', 
+    'toggle', 'cd', 'chmod', 'chown', 'chgrp', 'chsh', 'su', 'sudo', 
+    'passwd', 'transform', 'reconfigure', 'shift', 'move'
+  ],
+
+  'COPY': [
+    'copy', 'cp', 'scp', 'duplicate', 'replicate', 'clone', 'backup', 
+    'mirror', 'xcopy', 'robocopy', 'rsync', 'reproduce', 'snapshot', 
+    'sync', 'synchronize', 'transfer', 'multiply', 'reproduction', 
+    'cloning', 'duplication', 'back-up'
+  ],
+
+  'MOVE': [
+    'move', 'mv', 'relocate', 'transfer', 'shift', 'displace', 'reposition', 
+    'migrate', 'migration', 'transport', 'cut', 'paste', 'place', 'put', 
+    'redirect', 'reroute', 'rearrange', 'reorganize', 'drag', 'drop', 
+    'carry', 'pathing', 'transferring'
+  ]
+}
+
+
+RENAME_KEYWORDS: tuple[str] = (
+  'rename', 'renaming', 'renamed',
+  'change', 'changing', 'changed',
+  'modify', 'modifying', 'modified',
+  'update', 'updating', 'updated',
+  'alter', 'altering',
+  'replace', 'replacing',
+  'relabel', 'relabeling',
+  'retitle', 'retitled'
+)
+
+CREATE_KEYWORDS: tuple[str] = (
+  'create', 'make', 'generate', 'build', 'construct', 'spawn', 'produce', 
+  'initiate', 'setup', 'instantiate', 'touch', 'mkdir', 'mkfile', 'md', 
+  'new', 'add', 'addition', 'start', 'write', 'launch', 'establish', 
+  'form', 'compose', 'allocate'
+)
+
+DIRECTORY_KEYWORDS: tuple[str] = (
+  'directory', 'folder', 'path', 'subdir', 'subdirectory', 'dir', 
+  'mkdir', 'md', 'cd', 'ls', 'pwd', 'tree', 'location', 'root', 
+  'home', 'destination', 'source', 'mount', 'volume', 'pathname',
+  'folderpath', 'filepath'
+)
+
+FILE_KEYWORDS: tuple[str] = (
+  'file', 'files', 'filename', 'document', 'doc', 'docs', 'text', 'txt',
+  'script', 'log', 'logs', 'image', 'img', 'photo', 'data', 'pdf', 
+  'archive', 'zip', 'item', 'object', 'attachment', 'extension', 'ext',
+  'binary', 'bin', 'executable', 'exe', 'readme', 'manifest', 'content',
+  'filepath', 'basename'
+)
+
+DELETE_KEYWORDS: tuple[str] = (
+  'delete', 'remove', 'erase', 'destroy', 'kill', 'purge', 'rm', 'del',
+  'rmdir', 'wipe', 'clear', 'trash', 'discard', 'terminate', 'eliminate',
+  'scrap', 'cancel', 'drop', 'unlink', 'expunge', 'cleanup', 'clean',
+  'obliterate', 'uninstall', 'bin'
+)
+
+SHOW_KEYWORDS: tuple[str] = (
+  'show', 'display', 'view', 'list', 'ls', 'dir', 'cat', 'type', 'print', 
+  'echo', 'read', 'see', 'reveal', 'look', 'check', 'inspect', 'examine', 
+  'find', 'locate', 'grep', 'tree', 'more', 'less', 'head', 'tail', 
+  'stat', 'status', 'info', 'information', 'contents', 'details', 
+  'output', 'map', 'listout'
+)
+
+CHANGE_KEYWORDS: tuple[str] = (
+  'change', 'modify', 'alter', 'update', 'edit', 'switch', 'swap', 
+  'replace', 'convert', 'set', 'reset', 'adjust', 'configure', 'tweak', 
+  'toggle', 'cd', 'chmod', 'chown', 'chgrp', 'chsh', 'su', 'sudo', 
+  'passwd', 'transform', 'reconfigure', 'shift', 'move'
+)
+
+COPY_KEYWORDS: tuple[str] = (
+  'copy', 'cp', 'scp', 'duplicate', 'replicate', 'clone', 'backup', 
+  'mirror', 'xcopy', 'robocopy', 'rsync', 'reproduce', 'snapshot', 
+  'sync', 'synchronize', 'transfer', 'multiply', 'reproduction', 
+  'cloning', 'duplication', 'back-up'
+)
+
+MOVE_KEYWORDS: tuple[str] = (
+  'move', 'mv', 'relocate', 'transfer', 'shift', 'displace', 'reposition', 
+  'migrate', 'migration', 'transport', 'cut', 'paste', 'place', 'put', 
+  'redirect', 'reroute', 'rearrange', 'reorganize', 'drag', 'drop', 
+  'carry', 'pathing', 'transferring'
+)
+
+COMMANDS = json.load(open('data/linuxcommands.json', encoding='utf-8'))
+
+def categories() -> set[str]:
+  return {
+    'all',
+    'rename',
+    'create',
+    'delete',
+    'show',
+    'change',
+    'copy',
+    'move',
+    'directory',
+    'file',
   }
-  COMMANDS = json.load(open('data/linuxcommands.json', encoding='utf-8'))
 
 
-COMMANDS: list[dict[str: str]] = Datasets.COMMANDS
-RENAME_KEYWORDS: tuple[str] = Datasets.KEYWORDS['RENAME']
-CREATE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['CREATE']
-DIRECTORY_KEYWORDS: tuple[str] = Datasets.KEYWORDS['DIRECTORY']
-FILE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['FILE']
-DELETE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['DELETE']
-SHOW_KEYWORDS: tuple[str] = Datasets.KEYWORDS['SHOW']
-CHANGE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['CHANGE']
-COPY_KEYWORDS: tuple[str] = Datasets.KEYWORDS['COPY']
-MOVE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['MOVE']
+def tagged_commands(categs: set[str] = {'all'}) -> list[dict[str: str]]:
 
-def tag_commands(commands: list[dict[str: str]]) -> list[dict[str: str]]:
-  tagged = json.load(open('data/commands-vocabulary.json'))
+  categs = { *map(str.lower, categs) }
+  categs.intersection_update(categories())
+
+  categ2key = {
+    'all': [
+      'REMOVE_DIR', 
+      'CREATE_FILE', 
+      'UNDEFINED', 
+      'SHOW_FILE', 
+      'CREATE_DIR', 
+      'REMOVE_FILE', 
+      'MOVE', 
+      'RENAME', 
+      'SHOW_DIR', 
+      'CHANGE_DIR', 
+      'COPY'
+    ],
+    'rename': ['RENAME'],
+    'create': ['CREATE_FILE', 'CREATE_DIR'],
+    'delete': ['REMOVE_DIR', 'REMOVE_FILE'],
+    'show': ['SHOW_DIR', 'SHOW_FILE'],
+    'change': ['CHANGE_DIR'],
+    'copy': ['COPY'],
+    'move': ['MOVE'],
+    'directory': [
+      'CREATE_DIR', 
+      'SHOW_DIR', 
+      'REMOVE_DIR', 
+      'MOVE', 
+      'RENAME', 
+      'COPY', 
+      'CHANGE_DIR'
+    ],
+    'file': [
+      'CREATE_FILE', 
+      'SHOW_FILE', 
+      'REMOVE_FILE', 
+      'MOVE', 
+      'RENAME', 
+      'COPY'
+    ],
+  }
+    
+  targets = list(chain(*[keywords for (categ, keywords) in categ2key.items() if categ in categs]))
+  tagged_vocabulary = json.load(open('data/commands-vocabulary.json'))
 
   tagged_commands = []
-  for command in commands:
+  for command in COMMANDS:
     natural_command: str = command['input']
-    target_label: str = command['output'].split(' ')[0]
-    tasks: list[str] = tagged[target_label]
-    
+    source_command: str = command['output'].split(' ')[0]
+    target_tasks: list[str] = tagged_vocabulary[source_command]
     tagged_command = {'input': natural_command}
-
     natural_command_words: list[str] = list(map(str.lower, natural_command.split(' ')))
 
-    if target_label == 'rm': 
+    if source_command == 'rm': 
       tagged_command['output'] = 'REMOVE_DIR' if 'directory' in natural_command_words else 'REMOVE_FILE'
-    elif target_label == 'mv': 
+    elif source_command == 'mv': 
       tagged_command['output'] = 'MOVE' if 'move' in natural_command_words else 'RENAME'
-    else: 
-      tagged_command['output'] = tasks[0]
+    else:
+      tagged_command['output'] = target_tasks[0]
 
-    tagged_commands.append(tagged_command)
+    if tagged_command['output'] in targets:
+      tagged_commands.append(tagged_command)
 
   return tagged_commands
