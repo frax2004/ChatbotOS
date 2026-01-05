@@ -1,6 +1,5 @@
 import json
 
-
 class Datasets:
   KEYWORDS: dict[str: tuple[str]] = {
     'RENAME': (
@@ -62,17 +61,42 @@ class Datasets:
       'migrate', 'migration', 'transport', 'cut', 'paste', 'place', 'put', 
       'redirect', 'reroute', 'rearrange', 'reorganize', 'drag', 'drop', 
       'carry', 'pathing', 'transferring'
-    )
+    ),
   }
-  COMMANDS = json.load(open('data/linux-command-dataset/linuxcommands.json', encoding='utf-8'))
+  COMMANDS = json.load(open('data/linuxcommands.json', encoding='utf-8'))
 
 
-  RENAME_KEYWORDS: tuple[str] = KEYWORDS['RENAME']
-  CREATE_KEYWORDS: tuple[str] = KEYWORDS['CREATE']
-  DIRECTORY_KEYWORDS: tuple[str] = KEYWORDS['DIRECTORY']
-  FILE_KEYWORDS: tuple[str] = KEYWORDS['FILE']
-  DELETE_KEYWORDS: tuple[str] = KEYWORDS['DELETE']
-  SHOW_KEYWORDS: tuple[str] = KEYWORDS['SHOW']
-  CHANGE_KEYWORDS: tuple[str] = KEYWORDS['CHANGE']
-  COPY_KEYWORDS: tuple[str] = KEYWORDS['COPY']
-  MOVE_KEYWORDS: tuple[str] = KEYWORDS['MOVE']
+COMMANDS: list[dict[str: str]] = Datasets.COMMANDS
+RENAME_KEYWORDS: tuple[str] = Datasets.KEYWORDS['RENAME']
+CREATE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['CREATE']
+DIRECTORY_KEYWORDS: tuple[str] = Datasets.KEYWORDS['DIRECTORY']
+FILE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['FILE']
+DELETE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['DELETE']
+SHOW_KEYWORDS: tuple[str] = Datasets.KEYWORDS['SHOW']
+CHANGE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['CHANGE']
+COPY_KEYWORDS: tuple[str] = Datasets.KEYWORDS['COPY']
+MOVE_KEYWORDS: tuple[str] = Datasets.KEYWORDS['MOVE']
+
+def tag_commands(commands: list[dict[str: str]]) -> list[dict[str: str]]:
+  tagged = json.load(open('data/commands-vocabulary.json'))
+
+  tagged_commands = []
+  for command in commands:
+    natural_command: str = command['input']
+    target_label: str = command['output'].split(' ')[0]
+    tasks: list[str] = tagged[target_label]
+    
+    tagged_command = {'input': natural_command}
+
+    natural_command_words: list[str] = list(map(str.lower, natural_command.split(' ')))
+
+    if target_label == 'rm': 
+      tagged_command['output'] = 'REMOVE_DIR' if 'directory' in natural_command_words else 'REMOVE_FILE'
+    elif target_label == 'mv': 
+      tagged_command['output'] = 'MOVE' if 'move' in natural_command_words else 'RENAME'
+    else: 
+      tagged_command['output'] = tasks[0]
+
+    tagged_commands.append(tagged_command)
+
+  return tagged_commands

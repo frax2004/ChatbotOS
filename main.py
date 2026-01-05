@@ -1,25 +1,24 @@
 from nltk.classify import NaiveBayesClassifier
 from chatbotos.tokenizers import SplitTokenizer
 import chatbotos.pretrain as pt
-from chatbotos.datasets import Datasets
-
-
-
-
+from chatbotos.datasets import Datasets, tag_commands
 
 # Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk
 # (tipo articoli, preposizioni)
 # (l'unico contenuto informativo potrebbero darlo le congiunzioni tipo "and" che possono servire ad identificare
 # la presenza di più task)
 # Per più task, per determinare l'ordine si fa pos tagging per estrarre le piu frasi in un solo prompt
+
+tagged = tag_commands(Datasets.COMMANDS)
+
 while True:
   prompt: str = input(">> ")
-
-  classifier = NaiveBayesClassifier()
-
   sentence = SplitTokenizer.tokenize(prompt)
-  features = pt.extract_features(sentence)
 
+  
+
+  # print(pt.split_keywords(sentence))
+  # features = pt.extract_features(sentence)
 
 
   # splitten = pt.check_sentence_for_non_keywords(sentence_tokens)

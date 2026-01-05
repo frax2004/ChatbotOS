@@ -1,29 +1,19 @@
 from chatbotos.datasets import Datasets
 from nltk.metrics import edit_distance
+from itertools import chain
 
-def check_keywords(word: str):
-  for (tag, items) in Datasets.KEYWORDS.items():
-    if word in items:
-      return (word, True)
-  return (word, False)
-
-def check_sentence_for_non_keywords(sentence: list[str]):
-  check_list: list[tuple[str, bool]] = []
-  for word in sentence:
-    check_list.append(check_keywords(word))
-  
-  return check_list
+def split_keywords(sentence: list[str]):
+  is_keyword = lambda w: w in chain(*Datasets.KEYWORDS.values())
+  return list((word, 'keyword' if is_keyword(word) else 'non-keyword') for word in sentence)
 
 def extract_features(sentence: list[str]) -> dict[str: bool]:
-  def extract_feature(word: str) -> dict[str: bool]:
-    return { 
-      tag: bool(word in keywords) 
-      for (tag, keywords) in Datasets.KEYWORDS.items() 
-    }
+  extract_features_word = lambda w: {
+    tag: bool(w in keywords) for (tag, keywords) in Datasets.KEYWORDS.items()
+  }
+  sentence_features: dict[str: bool] = dict.fromkeys(Datasets.KEYWORDS.keys(), False)
 
-  sentence_features: dict[str: bool] = { key: False for key in Datasets.KEYWORDS.keys() }
   for word in sentence:
-    features = extract_feature(word)
+    features = extract_features_word(word)
     for feature in sentence_features.keys():
       sentence_features[feature] = sentence_features[feature] | features[feature]
 
