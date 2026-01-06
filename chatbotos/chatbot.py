@@ -2,8 +2,9 @@ from nltk.classify import NaiveBayesClassifier
 from chatbotos.pretrain import train_test_split, extract_features
 from chatbotos.datasets import COMMANDS, tagged_commands
 from chatbotos.tokenizers import SplitTokenizer
+from chatbotos.tasks import TASKS
 import sys
-from nltk import ConfusionMatrix
+import os
 
 # Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk
 # (tipo articoli, preposizioni)
@@ -30,7 +31,15 @@ class Chatbot:
     while True:
       prompt: str = input(">> ")
       if prompt == 'exit': break
-      task = self.classify_task(prompt)
-      print(f"classified task: {task}")
+      taskname = self.classify_task(prompt)
+
+      Task = TASKS[taskname]
+      task = Task()
+      task.fill(prompt)
+      command = task.build()
+
+      answer = input("Executing \"{}\" command. are you sure? yes/no: ".format(command))
+
+      if answer == 'yes': os.system(command)
 
     sys.stdin, sys.stdout = stdin, stdout
