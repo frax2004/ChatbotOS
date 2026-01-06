@@ -3,6 +3,7 @@ from chatbotos.pretrain import train_test_split, extract_features
 from chatbotos.datasets import COMMANDS, tagged_commands
 from chatbotos.tokenizers import SplitTokenizer
 import sys
+from nltk import ConfusionMatrix
 
 # Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk
 # (tipo articoli, preposizioni)
@@ -14,7 +15,7 @@ class Chatbot:
     self.__tagged__ = {command['input'] : command['output'] for command in tagged_commands()}
     sentences = [command['input'].split(' ') for command in COMMANDS]
     feature_set = [(extract_features(sentence), ' '.join(sentence)) for sentence in sentences]
-    self.__train_set__, self.__test_set__ = train_test_split(feature_set, .5)
+    self.__train_set__, self.__test_set__ = train_test_split(feature_set, .75)
     self.__classifier__ = NaiveBayesClassifier.train(self.__train_set__)
 
   def classify_task(self, prompt) -> str:

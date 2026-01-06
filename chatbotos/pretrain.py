@@ -3,7 +3,8 @@ from nltk.metrics import edit_distance
 from itertools import chain
 
 def split_keywords(sentence: list[str]):
-  is_keyword = lambda w: w in chain(*KEYWORDS.values())
+  keywords = set(chain(*KEYWORDS.values()))
+  is_keyword = lambda w: w in keywords
   return list((word, 'keyword' if is_keyword(word) else 'non-keyword') for word in sentence)
 
 

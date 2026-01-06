@@ -159,7 +159,7 @@ def categories() -> set[str]:
   }
 
 
-def tagged_commands(categs: set[str] = {'all'}) -> list[dict[str, str]]:
+def tagged_commands(categs: set[str] = {'all', }) -> list[dict[str, str]]:
 
   categs = { *map(str.lower, categs) }
   categs.intersection_update(categories())
@@ -203,8 +203,8 @@ def tagged_commands(categs: set[str] = {'all'}) -> list[dict[str, str]]:
       'COPY'
     ],
   }
-    
-  targets = list(chain(*[keywords for (categ, keywords) in categ2key.items() if categ in categs]))
+
+  possible_tasks = list(chain(*[keywords for (categ, keywords) in categ2key.items() if categ in categs]))
   tagged_vocabulary = json.load(open('data/commands-vocabulary.json'))
 
   tagged_commands = []
@@ -215,6 +215,9 @@ def tagged_commands(categs: set[str] = {'all'}) -> list[dict[str, str]]:
     tagged_command = {'input': natural_command}
     natural_command_words: list[str] = list(map(str.lower, natural_command.split(' ')))
 
+    if source_command == 'sudo': 
+      source_command = command['output'].split(' ')[1]
+
     if source_command == 'rm': 
       tagged_command['output'] = 'REMOVE_DIR' if 'directory' in natural_command_words else 'REMOVE_FILE'
     elif source_command == 'mv': 
@@ -222,7 +225,7 @@ def tagged_commands(categs: set[str] = {'all'}) -> list[dict[str, str]]:
     else:
       tagged_command['output'] = target_tasks[0]
 
-    if tagged_command['output'] in targets:
+    if tagged_command['output'] in possible_tasks:
       tagged_commands.append(tagged_command)
 
   return tagged_commands
