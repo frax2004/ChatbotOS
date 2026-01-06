@@ -11,7 +11,7 @@ import os
 # (l'unico contenuto informativo potrebbero darlo le congiunzioni tipo "and" che possono servire ad identificare
 # la presenza di più task)
 # Per più task, per determinare l'ordine si fa pos tagging per estrarre le piu frasi in un solo prompt
-class Chatbot:
+class Eve:
   def __init__(self):
     self.__tagged__ = {command['input'] : command['output'] for command in tagged_commands()}
     sentences = [command['input'].split(' ') for command in COMMANDS]

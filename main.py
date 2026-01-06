@@ -1,8 +1,8 @@
-from chatbotos.chatbot import Chatbot
+from chatbotos.chatbot import Eve
 
-def main():  
-  model = Chatbot()
-  model.chat()
+def main():
+  eve = Eve()
+  eve.chat()
 
 if __name__ == '__main__':
   main()
