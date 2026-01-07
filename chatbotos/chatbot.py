@@ -14,6 +14,8 @@ from chatbotos.tasks.move_task import MoveTask
 from chatbotos.tasks.remove_dir_task import RemoveDirTask
 from chatbotos.tasks.show_file_task import ShowFileTask
 from chatbotos.tasks.show_dir_task import ShowDirTask
+from chatbotos.tasks.create_dir_task import CreateDirTask
+from chatbotos.tasks.remove_file_task import RemoveFileTask
 
 # Other
 import sys
@@ -26,8 +28,8 @@ TASKS: dict[str, type[Task]] = {
   'SHOW_DIR': ShowDirTask,
   'COPY': CopyTask,
   'MOVE': MoveTask,
-  # 'CREATE_DIR': CreateDirTask, # directoryname, directory
-  # 'REMOVE_FILE': RemoveFileTask, # file, directory
+  'CREATE_DIR': CreateDirTask, # directoryname, directory
+  'REMOVE_FILE': RemoveFileTask, # file, directory
   # 'RENAME': RenameTask, # srcname, dstname
   # 'CHANGE_DIR': ChangeDirTask, # directory
 }
