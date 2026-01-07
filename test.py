@@ -1,22 +1,25 @@
 from nltk.test.gensim_fixt import setup_module
-from chatbotos.datasets import Datasets
+from nltk.corpus import brown
 import gensim
 
 setup_module()
 
-inputs: list[list[str]] = []
+inputs = brown.sents()
 
-for dictionary in Datasets.COMMANDS:
-  inputs.append(list(w.lower() for w in dictionary['input'].split(' ')))
 
-a = 1
+a = .75
 train_set = inputs[:int(round(len(inputs)*a))]
 model = gensim.models.Word2Vec(train_set)
 
-sim = model.wv.similarity('delete', 'create')
-print(sim)
 
-l = model.wv.most_similar(positive=['delete', 'file'], negative = ['create', 'directory'], topn = 8)
+while True:
+  s = input(">> ")
+  words = s.split(' ')
+  sims = []
+  for w in words:
+    try:
+      sims.append((w, model.wv.similarity('yes', w)))
+    except: pass
 
-for j in l:
-  print(j)
+  print(*sims, sep = '\n')
+    

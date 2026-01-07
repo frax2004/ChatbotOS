@@ -3,7 +3,6 @@ import os
 
 class CreateDirTask(Task):
   def __init__(self):
-    # TODO: rivedere quando c'è un POS_TAGGER buono
     super().__init__(
       ['directory', 'destination_dir'], 
       [

@@ -23,12 +23,22 @@ class Task:
   def build(self) -> str: ...
 
   def set_field(self, fieldname, value):
+    def is_truthy(ans) -> bool: return ans == 'yes'
+
     val = self.collectors[fieldname](value)
     response = random.choice(self[fieldname].acceptance_responses)
-    self.reply(response + ". I will use {}, right? ".format(val))
+    
+    confirms = (
+      "I will use \"{}\" right? ",
+      "Can we consider using \"{}\"? ",
+      "Is \"{}\" the final answer? "
+    )
+    
+    self.reply(response + ". " + random.choice(confirms).format(val))
 
     prompt = input(">> ")
-    if prompt == 'yes': # TODO word2vec per affermativa o negativa
+
+    if is_truthy(prompt):
       self[fieldname].field = val
       response = random.choice(self[fieldname].acceptance_responses)
     else: 
