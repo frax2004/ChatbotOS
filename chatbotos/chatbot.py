@@ -33,7 +33,6 @@ TASKS: dict[str, type[Task]] = {
   'SHOW_DIR': ShowDirTask,
   'CHANGE_DIR': ChangeDirTask, # directory
   # 'COPY': CopyTask, # file, srcdir, dstdir
-  # 'CHANGE_DIR': ChangeDirTask, # directory
 }
 
 # Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk
