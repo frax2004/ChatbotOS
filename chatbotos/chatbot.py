@@ -16,6 +16,7 @@ from chatbotos.tasks.show_file_task import ShowFileTask
 from chatbotos.tasks.show_dir_task import ShowDirTask
 from chatbotos.tasks.create_dir_task import CreateDirTask
 from chatbotos.tasks.remove_file_task import RemoveFileTask
+from chatbotos.tasks.change_dir_task import ChangeDirTask
 
 # Other
 import sys
@@ -31,7 +32,9 @@ TASKS: dict[str, type[Task]] = {
   'CREATE_DIR': CreateDirTask, # directoryname, directory
   'REMOVE_FILE': RemoveFileTask, # file, directory
   # 'RENAME': RenameTask, # srcname, dstname
-  # 'CHANGE_DIR': ChangeDirTask, # directory
+  'SHOW_DIR': ShowDirTask,
+  'CHANGE_DIR': ChangeDirTask, # directory
+  # 'COPY': CopyTask, # file, srcdir, dstdir
 }
 
 # Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk

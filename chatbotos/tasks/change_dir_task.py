@@ -1,19 +1,20 @@
 from chatbotos.tasks.task import Task
+import re
 import os
 
-class ShowDirTask(Task):
-  def __init__(self):
-    super().__init__(
-      ['directory'],
-      [
-        lambda pair: os.path.isdir(pair[0])
-      ],
-      [
-        lambda value: value
-      ]
-    )
+class ChangeDirTask(Task):
+    def __init__(self):
+        super().__init__(
+            ['directory'],
+            [
+                lambda pair: os.path.isdir(pair[0])
+            ],
+            [
+                lambda value: value
+            ]
+        )
 
-    self['directory'] = Task.EntryInfo(
+        self['directory'] = Task.EntryInfo(
             acceptance_responses= (
                 'Ok! I found the directory',
                 'The specified directory exists'
@@ -30,9 +31,9 @@ class ShowDirTask(Task):
                 "I need a directory"
             ),
             mandatory = True
-    )
-
-  def build(self) -> str:
-    return "dir {}".format(
-      self['directory'].field
-    )
+        )
+    
+    def build(self) -> str:
+        return "cd {}".format(
+            self['directory'].field
+        )
