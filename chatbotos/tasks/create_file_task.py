@@ -21,7 +21,7 @@ class CreateFileTask(Task):
     self['filename'] = Task.EntryInfo(
       rejection_responses = (
         "i didn't understand the file name, rewrite it.",
-        "write the file name please",
+        "write the file name please"
       ),
       questions = (
         "which file do you want to create?",
