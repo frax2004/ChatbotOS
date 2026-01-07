@@ -8,7 +8,7 @@ class RemoveDirTask(Task):
       [
         lambda pair: os.path.isdir(pair[0]),
         lambda pair: pair[1] == "ADJ" or pair[0].lower() in ["yes", "no"]
-      ]
+      ],
       [
         lambda value: value,
         lambda value: "/r" if value.lower() in ["recursive" or "yes"] else "" 

@@ -49,7 +49,7 @@ class CreateFileTask(Task):
     )
 
   def build(self) -> str:
-    return "echo > {}/{}.{}".format(
+    return "echo > {}\\{}.{}".format(
       self['directory'].field, 
       self['filename'].field, 
       self['extension'].field
