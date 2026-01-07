@@ -9,6 +9,7 @@ from chatbotos.datasets import COMMANDS, tagged_commands
 # Tasks
 from chatbotos.tasks.task import Task
 from chatbotos.tasks.create_file_task import CreateFileTask
+from chatbotos.tasks.show_file_task import ShowFileTask
 
 # Other
 import sys
@@ -18,7 +19,7 @@ import os
 TASKS: dict[str, type[Task]] = {
   'CREATE_FILE': CreateFileTask, 
   # 'REMOVE_DIR': RemoveDirTask, # directory
-  # 'SHOW_FILE': ShowFileTask, # file, directory
+  'SHOW_FILE': ShowFileTask,
   # 'CREATE_DIR': CreateDirTask, # directoryname, directory
   # 'REMOVE_FILE': RemoveFileTask, # file, directory
   # 'MOVE': MoveTask, # file, srcdir, dstdir
