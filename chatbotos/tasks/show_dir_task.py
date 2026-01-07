@@ -13,7 +13,7 @@ class ShowDirTask(Task):
       ]
     )
 
-        self['directory'] = Task.EntryInfo(
+    self['directory'] = Task.EntryInfo(
             acceptance_responses= (
                 'Ok! I found the directory',
                 'The specified directory exists'
@@ -30,7 +30,7 @@ class ShowDirTask(Task):
                 "I need a directory"
             ),
             mandatory = True
-        )
+    )
 
   def build(self) -> str:
     return "dir {}".format(
