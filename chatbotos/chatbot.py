@@ -24,6 +24,10 @@ class Eve:
     predicted_class = self.__classifier__.classify(extract_features(sentence))
     return self.__tagged__[predicted_class]
 
+  @staticmethod  
+  def reply(rep):
+    print("[\033[38;2;255;215;0mEve\033[0m] : " + rep)
+
   def chat(self, input_stream = sys.stdin, output_stream = sys.stdout):
     stdin, stdout = sys.stdin, sys.stdout
     sys.stdin, sys.stdout = input_stream, output_stream

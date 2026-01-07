@@ -1,11 +1,11 @@
 from chatbotos.tokenizers import SplitTokenizer
+from chatbotos.chatbot import Eve
 from dataclasses import dataclass
 from abc import abstractmethod
 from nltk import pos_tag
-import re
 import random
 import os
-
+import re
 
 class Task:
   @dataclass
@@ -46,30 +46,30 @@ class CreateFileTask(Task):
     super().__init__(['filename', 'directory', 'extension'])
     self['filename'] = Task.EntryInfo(
       rejection_responses = (
-        "[\033[38;2;255;215;0mEve\033[0m] : i didn't understand the file name, rewrite it.",
-        "[\033[38;2;255;215;0mEve\033[0m] : write the file name please",
+        "i didn't understand the file name, rewrite it.",
+        "write the file name please",
       ),
       questions = (
-        "[\033[38;2;255;215;0mEve\033[0m] : which file do you want to create?",
-        "[\033[38;2;255;215;0mEve\033[0m] : can you give a file name?",
-        "[\033[38;2;255;215;0mEve\033[0m] : can you specify what file name?",
-        "[\033[38;2;255;215;0mEve\033[0m] : can you give one file name?"
+        "which file do you want to create?",
+        "can you give a file name?",
+        "can you specify what file name?",
+        "can you give one file name?"
       ),
       matches = r"[a-zA-Z0-9_]*((\.[a-zA-Z0-9_])+)",
       mandatory = True
     )
     self['extension'] = Task.EntryInfo(
       questions = (
-        "[\033[38;2;255;215;0mEve\033[0m] : i didn't understand the extension, can you specify one?",
-        "[\033[38;2;255;215;0mEve\033[0m] : can you specify an extension?"
+        "i didn't understand the extension, can you specify one?",
+        "can you specify an extension?"
       ),
       matches = r"[a-zA-Z0-9_]*((\.[a-zA-Z0-9_])+)",
       mandatory = True
     )
     self['directory'] = Task.EntryInfo(
       questions = (
-        "[\033[38;2;255;215;0mEve\033[0m] : i didn't understand the directory, do you want to specify one?",
-        "[\033[38;2;255;215;0mEve\033[0m] : can you give a directory name?"
+        "i didn't understand the directory, do you want to specify one?",
+        "can you give a directory name?"
       ),
       mandatory = True
     )
@@ -101,7 +101,8 @@ class CreateFileTask(Task):
 
     while len([1 for (_, v) in self.frame.items() if v.mandatory and v.field == None]) > 0:
       response = random.choice(self[[k for k, v in self.frame.items() if v.mandatory and v.field == None][0]].questions)
-      prompt = input(response + "\n>> ")
+      Eve.reply(response)
+      prompt = input(">> ")
       sentence = SplitTokenizer.tokenize(prompt)
       tagged_sentence = pos_tag(sentence, tagset = 'universal')
       inputs = {
