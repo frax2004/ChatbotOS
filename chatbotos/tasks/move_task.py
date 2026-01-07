@@ -80,7 +80,7 @@ class MoveTask(Task):
 
   def build(self):
     return 'move {}\\{} {}'.format(
-      self['filename'].field,
       self['source directory'].field,
+      self['filename'].field,
       self['destination directory'].field
     )
