@@ -2,6 +2,7 @@ from chatbotos.tasks.task import Task
 import re
 import os
 
+#TODO: sistemare il riconoscimento di questa task
 class ShowFileTask(Task):
     def __init__(self):
         super().__init__(
@@ -9,6 +10,7 @@ class ShowFileTask(Task):
             [
                 lambda pair: pair[1] == 'NOUN' and re.match(self['filename'].matches, pair[0]),
                 lambda pair: pair[1] == 'NOUN' and re.match(self['extension'].matches, pair[0]),
+                #potremmo doverlo cambiare
                 lambda pair: os.path.isdir(pair[0])
             ], 
             [
@@ -83,7 +85,7 @@ class ShowFileTask(Task):
         )
 
     def build(self) -> str:
-        return "type > {}/{}.{}".format(
+        return "type {}/{}.{}".format(
             self['directory'].field, 
             self['filename'].field, 
             self['extension'].field
