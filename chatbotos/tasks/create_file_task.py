@@ -19,6 +19,9 @@ class CreateFileTask(Task):
     )
 
     self['filename'] = Task.EntryInfo(
+      acceptance_responses = (
+        "letzgoski",
+      ),
       rejection_responses = (
         "i didn't understand the file name, rewrite it.",
         "write the file name please"
@@ -33,6 +36,9 @@ class CreateFileTask(Task):
       mandatory = True
     )
     self['extension'] = Task.EntryInfo(
+      acceptance_responses = (
+        "letzgoski",
+      ),
       questions = (
         "i didn't understand the extension, can you specify one?",
         "can you specify an extension?"
@@ -41,6 +47,9 @@ class CreateFileTask(Task):
       mandatory = True
     )
     self['directory'] = Task.EntryInfo(
+      acceptance_responses = (
+        "letzgoski",
+      ),
       questions = (
         "i didn't understand the directory, do you want to specify one?",
         "can you give a directory name?"
@@ -49,7 +58,7 @@ class CreateFileTask(Task):
     )
 
   def build(self) -> str:
-    return "echo > {}/{}.{}".format(
+    return "echo > {}\\{}.{}".format(
       self['directory'].field, 
       self['filename'].field, 
       self['extension'].field

@@ -4,21 +4,20 @@ import os
 
 #TODO: sistemare il riconoscimento di questa task
 class ShowFileTask(Task):
-    def __init__(self):
-        super().__init__(
-            ['filename', 'extension', 'directory'],
-            [
-                lambda pair: pair[1] == 'NOUN' and re.match(self['filename'].matches, pair[0]),
-                lambda pair: pair[1] == 'NOUN' and re.match(self['extension'].matches, pair[0]),
-                #potremmo doverlo cambiare
-                lambda pair: os.path.isdir(pair[0])
-            ], 
-            [
-                lambda value: value[ : value.rfind('.') ],
-                lambda value: value[value.rfind('.') + 1 : ],
-                lambda value: value
-            ]
-        )
+  def __init__(self):
+    super().__init__(
+      ['filename', 'extension', 'directory'],
+      [
+        lambda pair: pair[1] == 'NOUN' and re.match(self['filename'].matches, pair[0]),
+        lambda pair: pair[1] == 'NOUN' and re.match(self['extension'].matches, pair[0]),
+        lambda pair: os.path.isdir(pair[0])
+      ], 
+      [
+        lambda value: value[ : value.rfind('.') ],
+        lambda value: value[value.rfind('.') + 1 : ],
+        lambda value: value
+      ]
+    )
 
         self['filename'] = Task.EntryInfo(
             acceptance_responses= (
@@ -84,9 +83,9 @@ class ShowFileTask(Task):
             mandatory = True
         )
 
-    def build(self) -> str:
-        return "type {}/{}.{}".format(
-            self['directory'].field, 
-            self['filename'].field, 
-            self['extension'].field
-        )
+  def build(self) -> str:
+    return "type {}\\{}.{}".format(
+      self['directory'].field, 
+      self['filename'].field, 
+      self['extension'].field
+    )

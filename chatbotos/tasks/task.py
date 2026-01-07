@@ -22,6 +22,20 @@ class Task:
   @abstractmethod
   def build(self) -> str: ...
 
+  def set_field(self, fieldname, value):
+    val = self.collectors[fieldname](value)
+    response = random.choice(self[fieldname].acceptance_responses)
+    self.reply(response + ". I will use {}, right? ".format(val))
+
+    prompt = input(">> ")
+    if prompt == 'yes': # TODO word2vec per affermativa o negativa
+      self[fieldname].field = val
+      response = random.choice(self[fieldname].acceptance_responses)
+    else: 
+      response = random.choice(self[fieldname].rejection_responses)
+
+    self.reply(response)
+
   def fill(self, prompt: str):
     def mapper(pair): 
       return pair[0]
@@ -36,7 +50,7 @@ class Task:
 
     for fieldname, values in inputs.items():
       if len(values) == 1:
-        self[fieldname].field = self.collectors[fieldname](values[0])
+        self.set_field(fieldname, values[0])
 
     while len([1 for (_, v) in self.frame.items() if v.mandatory and v.field == None]) > 0:
       # Check for fields yet to fill
@@ -64,19 +78,7 @@ class Task:
       # # Set the values for each fieldname
       for (fieldname, values) in inputs.items():
         if len(values) == 1 and self[fieldname].field == None:
-          self[fieldname].field = self.collectors[fieldname](values[0])
-
-      # values = inputs['filename']
-      # if len(values) == 1 and self['filename'].field == None:
-      #   self['filename'].field = values[0][ : values[0].rfind('.') ]
-
-      # values = inputs['extension']
-      # if len(values) == 1 and self['extension'].field == None:
-      #   self['extension'].field = values[0][values[0].rfind('.') + 1 : ]
-
-      # values = inputs['directory']
-      # if len(values) == 1 and self['directory'].field == None:
-      #   self['directory'].field = values[0]
+          self.set_field(fieldname, values[0])
 
   def __init__(self, labels: list[str] = [], predicates: list = [], collectors: list = []):
     self.frame: dict[str, Task.EntryInfo] = dict.fromkeys(labels)
