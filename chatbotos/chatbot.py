@@ -9,6 +9,7 @@ from chatbotos.datasets import COMMANDS, tagged_commands
 # Tasks
 from chatbotos.tasks.task import Task
 from chatbotos.tasks.create_file_task import CreateFileTask
+from chatbotos.tasks.copy_task import CopyTask
 
 # Other
 import sys
@@ -25,7 +26,7 @@ TASKS: dict[str, type[Task]] = {
   # 'RENAME': RenameTask, # srcname, dstname
   # 'SHOW_DIR': ShowDirTask, # directory
   # 'CHANGE_DIR': ChangeDirTask, # directory
-  # 'COPY': CopyTask, # file, srcdir, dstdir
+  'COPY': CopyTask, # file, srcdir, dstdir
 }
 
 # Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk
