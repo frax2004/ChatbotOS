@@ -1,25 +1,17 @@
 from nltk.test.gensim_fixt import setup_module
-from nltk.corpus import brown
+from nltk.corpus import *
 import gensim
+import os
+import matplotlib.pyplot as plt
 
 setup_module()
 
-inputs = brown.sents()
+filenames = os.listdir('embeddings')
 
+X = ['yes', 'yeah', 'ok', 'absolutely', 'surely', 'sure']
 
-a = .75
-train_set = inputs[:int(round(len(inputs)*a))]
-model = gensim.models.Word2Vec(train_set)
+model = gensim.models.Word2Vec.load("embeddings/brown.embedding")
+Y = [model.wv.similarity('yes', w) for w in X]
+plt.scatter(X, Y)
+plt.show()
 
-
-while True:
-  s = input(">> ")
-  words = s.split(' ')
-  sims = []
-  for w in words:
-    try:
-      sims.append((w, model.wv.similarity('yes', w)))
-    except: pass
-
-  print(*sims, sep = '\n')
-    

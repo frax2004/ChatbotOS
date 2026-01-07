@@ -5,9 +5,9 @@ import os
 class CreateFileTask(Task):
   def __init__(self):
     super().__init__(
-      ['filename', 'extension', 'directory'], 
+      ['file name', 'extension', 'directory'], 
       [
-        lambda pair: pair[1] == 'NOUN' and re.match(self['filename'].matches, pair[0]),
+        lambda pair: pair[1] == 'NOUN' and re.match(self['file name'].matches, pair[0]),
         lambda pair: pair[1] == 'NOUN' and re.match(self['extension'].matches, pair[0]),
         lambda pair: os.path.isdir(pair[0])
       ],
@@ -18,7 +18,7 @@ class CreateFileTask(Task):
       ]
     )
 
-    self['filename'] = Task.EntryInfo(
+    self['file name'] = Task.EntryInfo(
       acceptance_responses = (
         "letzgoski",
       ),
@@ -60,6 +60,6 @@ class CreateFileTask(Task):
   def build(self) -> str:
     return "echo > {}\\{}.{}".format(
       self['directory'].field, 
-      self['filename'].field, 
+      self['file name'].field, 
       self['extension'].field
     )

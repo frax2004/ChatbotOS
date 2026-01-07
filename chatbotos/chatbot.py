@@ -22,6 +22,9 @@ from chatbotos.tasks.rename_task import RenameTask
 # Other
 import sys
 import os
+import random
+
+from chatbotos.utils import similarity
 
 TASKS: dict[str, type[Task]] = {
   'CREATE_FILE': CreateFileTask, 
@@ -59,18 +62,51 @@ class Eve:
     stdin, stdout = sys.stdin, sys.stdout
     sys.stdin, sys.stdout = input_stream, output_stream
 
+    initial_responses = (
+      'Hello user, how may i help you?',
+      'Hi there, how can i help you today?',
+      'What can i do today for you?',
+      'Welcome back user, what do we do?'
+    )
+
+    mid_responses = (
+      "Great! what's next?",
+      "Anything else?",
+      "What do we do now?"
+    )
+
+    final_responses = (
+      'All right! See you soon...',
+      'As you wish user, see you later!',
+      "Bye bye!",
+      "See you next time user!"
+    )
+
+    response = random.choice(initial_responses)
+    Task.reply(response)
+
     while True:
-      prompt: str = input(">> ")
+      prompt: str = Task.user()
       if prompt == 'exit': break
       taskname = self.classify_task(prompt)
 
-      Task = TASKS[taskname]
-      task = Task()
-      task.fill(prompt)
-      command = task.build()
+      TaskType = TASKS.get(taskname)
 
-      answer = input("Executing \"{}\" command. are you sure? yes/no: ".format(command))
+      if TaskType != None:
+        task = TaskType()
+        task.fill(prompt)
+        command = task.build()
 
-      if answer == 'yes': os.system(command)
+        Task.reply("Should i execute the \"{}\" command?".format(command))
+        answer = Task.user()
+
+        if similarity('yes', answer.split(' ')) > .8: 
+          os.system(command)
+      
+      response = random.choice(mid_responses)
+      Task.reply(response)
+
+    response = random.choice(final_responses)
+    Task.reply(response)
 
     sys.stdin, sys.stdout = stdin, stdout

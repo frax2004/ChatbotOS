@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from abc import abstractmethod
 from nltk import pos_tag
 import random
-
+from chatbotos.utils import similarity
 
 class Task:
   @dataclass
@@ -16,27 +16,31 @@ class Task:
     matches: str | None = None
 
   @staticmethod
-  def reply(rep):
-    print("[\033[38;2;255;215;0mEVE\033[0m] : " + rep)
+  def reply(rep: str = ""):
+    print("[\033[38;2;255;215;0mEVE\033[0m] << " + rep)
+
+  @staticmethod
+  def user(prompt: str = ""):
+    return input('[\033[38;2;0;168;201mUSER\033[0m] >> ' + prompt)
 
   @abstractmethod
   def build(self) -> str: ...
 
   def set_field(self, fieldname, value):
-    def is_truthy(ans) -> bool: return ans == 'yes'
+    def is_truthy(ans: str) -> bool: return similarity('yes', ans.split(' ')) > .8
 
     val = self.collectors[fieldname](value)
     response = random.choice(self[fieldname].acceptance_responses)
     
     confirms = (
-      "I will use \"{}\" right? ",
-      "Can we consider using \"{}\"? ",
-      "Is \"{}\" the final answer? "
+      "Do you mean \"{}\" as {} right? ",
+      "Can we consider using \"{}\" as {}? ",
+      "Is \"{}\" the final answer for {}? "
     )
     
-    self.reply(response + ". " + random.choice(confirms).format(val))
+    Task.reply(response + ". " + random.choice(confirms).format(val, fieldname))
 
-    prompt = input(">> ")
+    prompt = Task.user()
 
     if is_truthy(prompt):
       self[fieldname].field = val
@@ -44,7 +48,7 @@ class Task:
     else: 
       response = random.choice(self[fieldname].rejection_responses)
 
-    self.reply(response)
+    Task.reply(response)
 
   def fill(self, prompt: str):
     def mapper(pair): 
@@ -73,7 +77,7 @@ class Task:
       Task.reply(response)
 
       # Get user input
-      prompt = input(">> ")
+      prompt = Task.user()
 
       # Transform the prompt
       sentence = SplitTokenizer.tokenize(prompt)

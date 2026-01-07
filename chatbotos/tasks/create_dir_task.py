@@ -4,7 +4,7 @@ import os
 class CreateDirTask(Task):
   def __init__(self):
     super().__init__(
-      ['directory', 'destination_dir'], 
+      ['directory', 'destination directory'], 
       [
         lambda pair: pair[1] == 'NOUN',
         lambda pair: os.path.isdir(pair[0])
@@ -15,7 +15,7 @@ class CreateDirTask(Task):
       ]
     )
 
-    self['destination_dir'] = Task.EntryInfo(
+    self['destination directory'] = Task.EntryInfo(
       questions = (
         'Can you give the destination directory?',
         'In which directory do you want to create the folder?',
@@ -54,6 +54,6 @@ class CreateDirTask(Task):
   
   def build(self):
     return r"mkdir {}\{}".format(
-      self['destination_dir'].field,
+      self['destination directory'].field,
       self['directory'].field
     )

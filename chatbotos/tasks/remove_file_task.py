@@ -5,12 +5,12 @@ import re
 class RemoveFileTask(Task):
   def __init__(self):
     super().__init__(
-      ['filename'],
+      ['file name'],
       [lambda pair: os.path.isfile(pair[0])],
       [lambda value: value]
     )
         
-    self['filename'] = Task.EntryInfo(
+    self['file name'] = Task.EntryInfo(
       rejection_responses = (
         "I didn't understand the file name, rewrite it please.",
         "Can you write the file name please, I didn't understand?"
@@ -30,4 +30,4 @@ class RemoveFileTask(Task):
     )
 
   def build(self) -> str:
-    return "del /f {}".format(self['filename'].field)
+    return "del /f {}".format(self['file name'].field)

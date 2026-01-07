@@ -6,9 +6,9 @@ import os
 class ShowFileTask(Task):
   def __init__(self):
     super().__init__(
-      ['filename', 'extension', 'directory'],
+      ['file name', 'extension', 'directory'],
       [
-        lambda pair: pair[1] == 'NOUN' and re.match(self['filename'].matches, pair[0]),
+        lambda pair: pair[1] == 'NOUN' and re.match(self['file name'].matches, pair[0]),
         lambda pair: pair[1] == 'NOUN' and re.match(self['extension'].matches, pair[0]),
         lambda pair: os.path.isdir(pair[0])
       ], 
@@ -19,7 +19,7 @@ class ShowFileTask(Task):
       ]
     )
 
-    self['filename'] = Task.EntryInfo(
+    self['file name'] = Task.EntryInfo(
         acceptance_responses= (
             'I found the file!',
             'The file is in the directory',
@@ -86,6 +86,6 @@ class ShowFileTask(Task):
   def build(self) -> str:
     return "type {}\\{}.{}".format(
       self['directory'].field, 
-      self['filename'].field, 
+      self['file name'].field, 
       self['extension'].field
     )

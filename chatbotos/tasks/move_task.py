@@ -5,9 +5,9 @@ import os
 class MoveTask(Task):
   def __init__(self):
     super().__init__(
-      ['filename', 'source directory', 'destination directory'], 
+      ['file name', 'source directory', 'destination directory'], 
       [
-        lambda pair: pair[1] == 'NOUN' and re.match(self['filename'].matches, pair[0]),
+        lambda pair: pair[1] == 'NOUN' and re.match(self['file name'].matches, pair[0]),
         lambda pair: os.path.isdir(pair[0]),
         lambda pair: os.path.isdir(pair[0])
       ],
@@ -18,7 +18,7 @@ class MoveTask(Task):
       ]
     )
 
-    self['filename'] = Task.EntryInfo(
+    self['file name'] = Task.EntryInfo(
       questions = (
         'can you specify the file to move?',
         'can you give me the file to move?',
@@ -81,6 +81,6 @@ class MoveTask(Task):
   def build(self):
     return 'move {}\\{} {}'.format(
       self['source directory'].field,
-      self['filename'].field,
+      self['file name'].field,
       self['destination directory'].field
     )
