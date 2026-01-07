@@ -23,8 +23,18 @@ class Task:
   def build(self) -> str: ...
 
   def set_field(self, fieldname, value):
-    self[fieldname].field = self.collectors[fieldname](value)
-    self.reply(random.choice(self[fieldname].acceptance_responses))
+    val = self.collectors[fieldname](value)
+    response = random.choice(self[fieldname].acceptance_responses)
+    self.reply(response + ". I will use {}, right? ".format(val))
+
+    prompt = input(">> ")
+    if prompt == 'yes': # TODO word2vec per affermativa o negativa
+      self[fieldname].field = val
+      response = random.choice(self[fieldname].acceptance_responses)
+    else: 
+      response = random.choice(self[fieldname].rejection_responses)
+
+    self.reply(response)
 
   def fill(self, prompt: str):
     def mapper(pair): 

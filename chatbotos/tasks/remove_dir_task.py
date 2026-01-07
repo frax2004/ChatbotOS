@@ -11,7 +11,7 @@ class RemoveDirTask(Task):
       ],
       [
         lambda value: value,
-        lambda value: "/r" if value.lower() in ["recursive" or "yes"] else "" 
+        lambda value: "/r" if value.lower() in ["recursive", "yes"] else ""
       ]
     )
 
