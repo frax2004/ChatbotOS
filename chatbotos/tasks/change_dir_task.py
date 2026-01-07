@@ -2,12 +2,11 @@ from chatbotos.tasks.task import Task
 import re
 import os
 
-class ShowDirTask(Task):
+class ChangeDirTask(Task):
     def __init__(self):
         super().__init__(
             ['directory'],
             [
-                #potremmo doverlo cambiare
                 lambda pair: os.path.isdir(pair[0])
             ],
             [
@@ -33,9 +32,8 @@ class ShowDirTask(Task):
             ),
             mandatory = True
         )
-
-
+    
     def build(self) -> str:
-        return "dir {}".format(
+        return "cd {}".format(
             self['directory'].field
         )
