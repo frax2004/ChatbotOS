@@ -1,10 +1,32 @@
+# NLTK
 from nltk.classify import NaiveBayesClassifier
+
+# Pretraining
+from chatbotos.tokenizers import SplitTokenizer
 from chatbotos.pretrain import train_test_split, extract_features
 from chatbotos.datasets import COMMANDS, tagged_commands
-from chatbotos.tokenizers import SplitTokenizer
-from chatbotos.tasks import TASKS
+
+# Tasks
+from chatbotos.tasks.task import Task
+from chatbotos.tasks.create_file_task import CreateFileTask
+
+# Other
 import sys
 import os
+
+
+TASKS: dict[str, type[Task]] = {
+  'CREATE_FILE': CreateFileTask, 
+  # 'REMOVE_DIR': RemoveDirTask, 
+  # 'SHOW_FILE': ShowFileTask, 
+  # 'CREATE_DIR': CreateDirTask, 
+  # 'REMOVE_FILE': RemoveFileTask, 
+  # 'MOVE': MoveTask, 
+  # 'RENAME': RenameTask, 
+  # 'SHOW_DIR': ShowDirTask, 
+  # 'CHANGE_DIR': ChangeDirTask, 
+  # 'COPY': CopyTask,
+}
 
 # Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk
 # (tipo articoli, preposizioni)
@@ -23,10 +45,6 @@ class Eve:
     sentence = SplitTokenizer.tokenize(prompt)
     predicted_class = self.__classifier__.classify(extract_features(sentence))
     return self.__tagged__[predicted_class]
-
-  @staticmethod  
-  def reply(rep):
-    print("[\033[38;2;255;215;0mEve\033[0m] : " + rep)
 
   def chat(self, input_stream = sys.stdin, output_stream = sys.stdout):
     stdin, stdout = sys.stdin, sys.stdout
