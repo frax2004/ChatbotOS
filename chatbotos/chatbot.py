@@ -17,15 +17,15 @@ import os
 
 TASKS: dict[str, type[Task]] = {
   'CREATE_FILE': CreateFileTask, 
-  # 'REMOVE_DIR': RemoveDirTask, 
-  # 'SHOW_FILE': ShowFileTask, 
-  # 'CREATE_DIR': CreateDirTask, 
-  # 'REMOVE_FILE': RemoveFileTask, 
-  # 'MOVE': MoveTask, 
-  # 'RENAME': RenameTask, 
-  # 'SHOW_DIR': ShowDirTask, 
-  # 'CHANGE_DIR': ChangeDirTask, 
-  # 'COPY': CopyTask,
+  # 'REMOVE_DIR': RemoveDirTask, # directory
+  # 'SHOW_FILE': ShowFileTask, # file, directory
+  # 'CREATE_DIR': CreateDirTask, # directoryname, directory
+  # 'REMOVE_FILE': RemoveFileTask, # file, directory
+  # 'MOVE': MoveTask, # file, srcdir, dstdir
+  # 'RENAME': RenameTask, # srcname, dstname
+  # 'SHOW_DIR': ShowDirTask, # directory
+  # 'CHANGE_DIR': ChangeDirTask, # directory
+  # 'COPY': CopyTask, # file, srcdir, dstdir
 }
 
 # Per ignorare le parole "prive di contenuto informativo" si può utilizzare il pos tagger di nltk

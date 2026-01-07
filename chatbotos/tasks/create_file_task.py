@@ -9,7 +9,7 @@ class CreateFileTask(Task):
       [
         lambda pair: pair[1] == 'NOUN' and re.match(self['filename'].matches, pair[0]),
         lambda pair: pair[1] == 'NOUN' and re.match(self['extension'].matches, pair[0]),
-        lambda pair: pair[1] == 'NOUN' and os.path.isdir(pair[0])  
+        lambda pair: os.path.isdir(pair[0])
       ],
       [
         lambda value: value[ : value.rfind('.') ],
