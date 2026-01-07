@@ -80,7 +80,7 @@ class CopyTask(Task):
 
   def build(self):
     return 'copy {}\\{} {}'.format(
-      self['filename'].field,
       self['source directory'].field,
+      self['filename'].field,
       self['destination directory'].field
     )
