@@ -1,76 +1,204 @@
 import json
 from itertools import chain
+from nltk.grammar import CFG
+from nltk.parse.generate import generate
 
-KEYWORDS: dict[str, list[str]] = {
-  'RENAME': [
-    'rename', 'renaming', 'renamed',
-    'change', 'changing', 'changed',
-    'modify', 'modifying', 'modified',
-    'update', 'updating', 'updated',
-    'alter', 'altering',
-    'replace', 'replacing',
-    'relabel', 'relabeling',
-    'retitle', 'retitled'
-  ],
+####################################################################################################
+####################################################################################################
+#######                                      GRAMMARS                                        #######
+####################################################################################################
+####################################################################################################
 
-  'CREATE': [
-    'create', 'make', 'generate', 'build', 'construct', 'spawn', 'produce', 
-    'initiate', 'setup', 'instantiate', 'touch', 'mkdir', 'mkfile', 'md', 
-    'new', 'add', 'addition', 'start', 'write', 'launch', 'establish', 
-    'form', 'compose', 'allocate'
-  ],
+FILE = """
+  FILE -> "file" | "files" | "filename" | "document" | "doc" | "docs" | "script" | "archive" | "item" | "object" | "filepath" | "basename"
+"""
 
-  'DIRECTORY': [
-    'directory', 'folder', 'path', 'subdir', 'subdirectory', 'dir', 
-    'mkdir', 'md', 'cd', 'ls', 'pwd', 'tree', 'location', 'root', 
-    'home', 'destination', 'source', 'mount', 'volume', 'pathname',
-    'folderpath', 'filepath'
-  ],
+NOUN = """
+  NOUN -> "path/placeholder.extension" | "placeholder.extension"
+"""
 
-  'FILE': [
-    'file', 'files', 'filename', 'document', 'doc', 'docs', 'text', 'txt',
-    'script', 'log', 'logs', 'image', 'img', 'photo', 'data', 'pdf', 
-    'archive', 'zip', 'item', 'object', 'attachment', 'extension', 'ext',
-    'binary', 'bin', 'executable', 'exe', 'readme', 'manifest', 'content',
-    'filepath', 'basename'
-  ],
+FILE_OR_DIR = """
+  FILE_OR_DIR -> FILE | DIR
+  """
 
-  'DELETE': [
-    'delete', 'remove', 'erase', 'destroy', 'kill', 'purge', 'rm', 'del',
-    'rmdir', 'wipe', 'clear', 'trash', 'discard', 'terminate', 'eliminate',
-    'scrap', 'cancel', 'drop', 'unlink', 'expunge', 'cleanup', 'clean',
-    'obliterate', 'uninstall', 'bin'
-  ],
+SPECIFIER = """
+  SPECIFIER -> "this" | "a" | "that" | "the" |
+"""
 
-  'SHOW': [
-    'show', 'display', 'view', 'list', 'ls', 'dir', 'cat', 'type', 'print', 
-    'echo', 'read', 'see', 'reveal', 'look', 'check', 'inspect', 'examine', 
-    'find', 'locate', 'grep', 'tree', 'more', 'less', 'head', 'tail', 
-    'stat', 'status', 'info', 'information', 'contents', 'details', 
-    'output', 'map', 'listout'
-  ],
+DIR = """ 
+  DIR -> "directory" | "folder" | "path" | "subdir" | "subdirectory" | "dir" | "pathname" | "folderpath" | "filepath"
+"""  
 
-  'CHANGE': [
-    'change', 'modify', 'alter', 'update', 'edit', 'switch', 'swap', 
-    'replace', 'convert', 'set', 'reset', 'adjust', 'configure', 'tweak', 
-    'toggle', 'cd', 'chmod', 'chown', 'chgrp', 'chsh', 'su', 'sudo', 
-    'passwd', 'transform', 'reconfigure', 'shift', 'move'
-  ],
 
-  'COPY': [
-    'copy', 'cp', 'scp', 'duplicate', 'replicate', 'clone', 'backup', 
-    'mirror', 'xcopy', 'robocopy', 'rsync', 'reproduce', 'snapshot', 
-    'sync', 'synchronize', 'transfer', 'multiply', 'reproduction', 
-    'cloning', 'duplication', 'back-up'
-  ],
+REMAME_GRAMMAR = f"""
+  RENAME -> VERB SPECIFIER FILE_OR_DIR ENDING
+  
+  {FILE}
+  {NOUN}
+  {FILE_OR_DIR}
+  {SPECIFIER}
+  {DIR}
 
-  'MOVE': [
-    'move', 'mv', 'relocate', 'transfer', 'shift', 'displace', 'reposition', 
-    'migrate', 'migration', 'transport', 'cut', 'paste', 'place', 'put', 
-    'redirect', 'reroute', 'rearrange', 'reorganize', 'drag', 'drop', 
-    'carry', 'pathing', 'transferring'
-  ]
+  ENDING -> TO NOUN |
+  TO -> "to" | "as" | "into" | "in"
+  VERB -> "rename" | "renaming" | "renamed" | "change" | "changing" | "changed" | "updating" | "updated" | "modify" | "modifying" | "modified" | "update" | "alter" | "altering" | "replace"  | "replacing" | "relabel"  | "relabeling" | "retitle"  | "retitled" | "ren"
+"""
+
+# TODO Verificare che le tre flag create directory e file poste a true non diano problemi
+CREATE_FILE_GRAMMAR = f"""
+  CREATE -> VERB SPECIFIER NEW FILE ENDING
+  
+  NEW -> "new" |
+
+  {FILE}
+  {NOUN}
+  {SPECIFIER}
+  {DIR}
+
+  ENDING -> NAMING NOUN | NAMING NOUN TO DIR NOUN | TO NOUN |
+  TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
+  NAMING -> "named" | "called" | "known as" | "a.k.a"
+  VERB -> "create" | "make" | "generate" | "build" | "construct" | "spawn" | "produce" | "setup" | "instantiate" | "touch" | "mkfile" | "new" | "add" | "write" | "form" | "compose" | "allocate" | "initiate"
+"""
+
+CREATE_DIRECTORY_GRAMMAR = f"""
+  CREATE -> VERB SPECIFIER NEW DIR ENDING
+  
+  NEW -> "new" |
+
+  {NOUN}
+  {SPECIFIER}
+  {DIR}
+
+  ENDING -> NAMING NOUN | NAMING NOUN TO DIR NOUN | TO NOUN |
+  TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
+  NAMING -> "named" | "called" | "known as" | "a.k.a"
+  VERB -> "create" | "make" | "generate" | "build" | "construct" | "spawn" | "produce" | "setup" | "instantiate" | "touch" | "mkdir" | "md" | "new" | "add" | "write" | "form" | "compose" | "allocate" | "initiate"
+"""
+
+DELETE_FILE_GRAMMAR = f"""
+  DELETE -> VERB SPECIFIER FILE ENDING
+
+  {FILE}
+  {NOUN}
+  {FILE_OR_DIR}
+  {SPECIFIER}
+  {DIR}
+
+  ENDING -> FROM NOUN | FROM DIR NAMING NOUN |
+  NAMING -> "named" | "called" | "known as" | "a.k.a"
+  FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
+  VERB -> "delete" | "remove" | "erase" | "destroy" | "kill" | "rm" | "del" | "wipe" | "clear" | "trash" | "discard" | "terminate" | "eliminate" | "scrap" | "cancel" | "drop" | "unlink" | "expunge" | "obliterate" | "bin"
+
+"""
+
+DELETE_DIRECTORY_GRAMMAR = f"""
+  DELETE -> VERB SPECIFIER DIR ENDING RECURSIVELY
+
+  {FILE}
+  {NOUN}
+  {SPECIFIER}
+  {DIR}
+
+  RECURSIVELY -> "recursively" | "recursive" | 
+  ENDING -> FROM NOUN | FROM DIR NAMING NOUN |
+  NAMING -> "named" | "called" | "known as" | "a.k.a"
+  FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
+  VERB -> "delete" | "remove" | "erase" | "destroy" | "kill" | "rm" | "del" | "rmdir" | "wipe" | "clear" | "trash" | "discard" | "terminate" | "eliminate" | "scrap" | "cancel" | "drop" | "unlink" | "expunge" | "obliterate" | "bin"
+"""
+
+SHOW_FILE_GRAMMAR = f"""
+  SHOW -> VERB SPECIFIER FILE NAMING NOUN ENDING 
+  ENDING -> TO NOUN | TO DIR NAMING NOUN | 
+  
+  {FILE}
+  {NOUN}
+  {SPECIFIER}
+  {DIR}
+
+  TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in" | "located at" | "located in" | "from"
+  NAMING -> "named" | "called" | "known as" | "a.k.a"
+  VERB -> "show" | "display" | "view" | "cat" | "type" | "print" | "echo" | "read" | "see" | "reveal" | "look" | "check" | "inspect" | "examine" | "output"
+"""
+
+SHOW_DIRECTORY_GRAMMAR = f"""
+  SHOW -> VERB SPECIFIER DIR NAMING NOUN ENDING 
+  ENDING -> TO NOUN | TO DIR NAMING NOUN |
+  
+  {NOUN}
+  {SPECIFIER}
+  {DIR}
+
+  TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
+  NAMING -> "named" | "called" | "known as" | "a.k.a"
+  VERB -> "show" | "display" | "view" | "list" | "ls" | "dir" | "cat" | "type" | "print" | "echo" | "read" | "see" | "reveal" | "look" | "check" | "inspect" | "examine" | "output" | "listout"
+"""
+
+CHANGE_DIRECTORY_GRAMMAR = f"""
+  CHANGE -> VERB TO DIR NOUN | VERB TO NOUN
+
+  {NOUN}
+  {DIR}
+
+  TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in" | 
+  VERB -> "change" | "modify" | "alter" | "switch" | "swap" | "set" | "cd"  | "shift" | "go" | "put yourself"
+"""
+
+COPY_GRAMMAR = f"""
+  COPY -> VERB SPECIFIER FILE_OR_DIR MID ENDING
+
+  {FILE}
+  {NOUN}
+  {FILE_OR_DIR}
+  {SPECIFIER}
+  {DIR}
+
+  MID -> FROM DIR NAMING NOUN | FROM NAMING NOUN
+  ENDING -> TO NOUN |
+  NAMING -> "named" | "called" | "known as" | "a.k.a" |
+  FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
+  TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
+  VERB -> "copy" | "cp" | "scp" | "duplicate" | "replicate" | "clone" | "backup"  | "mirror" | "xcopy" | "robocopy" | "reproduce" | "snapshot" | "sync" | "synchronize" | "transfer" | "multiply" | "reproduct" | "reproduction" | "back-up"
+
+"""
+
+MOVE_GRAMMAR = f"""
+  MOVE -> VERB SPECIFIER FILE_OR_DIR MID ENDING
+
+  {FILE}
+  {NOUN}
+  {FILE_OR_DIR}
+  {SPECIFIER}
+  {DIR}
+
+  MID -> FROM DIR NAMING NOUN | FROM NAMING NOUN
+  ENDING -> TO NOUN |
+  NAMING -> "named" | "called" | "known as" | "a.k.a" |
+  FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
+  TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
+  VERB -> "move" | "mv" | "relocate" | "transfer" | "shift" | "displace" | "reposition" | "migrate" | "migration" | "transport" | "cut" | "paste" | "place" | "put" | "redirect" | "reroute" | "rearrange" | "reorganize" | "drag" | "drop"  | "carry" | "pathing" | "transferring"
+"""
+
+GRAMMARS: dict[str, str] = {
+  "REMAME" : REMAME_GRAMMAR,
+  "CREATE_FILE" : CREATE_FILE_GRAMMAR,
+  "CREATE_DIRECTORY" : CREATE_DIRECTORY_GRAMMAR,
+  "DELETE_FILE" : DELETE_FILE_GRAMMAR,
+  "DELETE_DIRECTORY" : DELETE_DIRECTORY_GRAMMAR,
+  "SHOW_FILE" : SHOW_FILE_GRAMMAR,
+  "SHOW_DIRECTORY" : SHOW_DIRECTORY_GRAMMAR,
+  "CHANGE_DIRECTORY" : CHANGE_DIRECTORY_GRAMMAR,
+  "COPY" : COPY_GRAMMAR,
+  "MOVE" : MOVE_GRAMMAR,
 }
+
+
+####################################################################################################
+####################################################################################################
+#######                                      KEYWORDS                                        #######
+####################################################################################################
+####################################################################################################
+
 
 
 RENAME_KEYWORDS: tuple = (
@@ -142,90 +270,121 @@ MOVE_KEYWORDS: tuple = (
   'carry', 'pathing', 'transferring'
 )
 
-COMMANDS = json.load(open('data/linuxcommands.json', encoding='utf-8'))
-
-def categories() -> set[str]:
-  return {
-    'all',
-    'rename',
-    'create',
-    'delete',
-    'show',
-    'change',
-    'copy',
-    'move',
-    'directory',
-    'file',
-  }
+KEYWORDS: dict[str, list[str]] = {
+  'RENAME': RENAME_KEYWORDS,
+  'CREATE': CREATE_KEYWORDS,
+  'DIRECTORY': DIRECTORY_KEYWORDS,
+  'FILE': FILE_KEYWORDS,
+  'DELETE': DELETE_KEYWORDS,
+  'SHOW': SHOW_KEYWORDS,
+  'CHANGE': CHANGE_KEYWORDS,
+  'COPY': COPY_KEYWORDS,
+  'MOVE': MOVE_KEYWORDS
+}
 
 
-def tagged_commands(categs: set[str] = {'all', }) -> list[dict[str, str]]:
 
-  categs = { *map(str.lower, categs) }
-  categs.intersection_update(categories())
 
-  categ2key = {
-    'all': [
-      'REMOVE_DIR', 
-      'CREATE_FILE', 
-      'UNDEFINED', 
-      'SHOW_FILE', 
-      'CREATE_DIR', 
-      'REMOVE_FILE', 
-      'MOVE', 
-      'RENAME', 
-      'SHOW_DIR', 
-      'CHANGE_DIR', 
-      'COPY'
-    ],
-    'rename': ['RENAME'],
-    'create': ['CREATE_FILE', 'CREATE_DIR'],
-    'delete': ['REMOVE_DIR', 'REMOVE_FILE'],
-    'show': ['SHOW_DIR', 'SHOW_FILE'],
-    'change': ['CHANGE_DIR'],
-    'copy': ['COPY'],
-    'move': ['MOVE'],
-    'directory': [
-      'CREATE_DIR', 
-      'SHOW_DIR', 
-      'REMOVE_DIR', 
-      'MOVE', 
-      'RENAME', 
-      'COPY', 
-      'CHANGE_DIR'
-    ],
-    'file': [
-      'CREATE_FILE', 
-      'SHOW_FILE', 
-      'REMOVE_FILE', 
-      'MOVE', 
-      'RENAME', 
-      'COPY'
-    ],
-  }
 
-  possible_tasks = list(chain(*[keywords for (categ, keywords) in categ2key.items() if categ in categs]))
-  tagged_vocabulary = json.load(open('data/commands-vocabulary.json'))
 
-  tagged_commands = []
-  for command in COMMANDS:
-    natural_command: str = command['input']
-    source_command: str = command['output'].split(' ')[0]
-    target_tasks: list[str] = tagged_vocabulary[source_command]
-    tagged_command = {'input': natural_command}
-    natural_command_words: list[str] = list(map(str.lower, natural_command.split(' ')))
 
-    if source_command == 'sudo': 
-      source_command = command['output'].split(' ')[1]
 
-    if source_command == 'rm': 
-      tagged_command['output'] = 'REMOVE_DIR' if 'directory' in natural_command_words else 'REMOVE_FILE'
-    elif source_command == 'mv': 
-      tagged_command['output'] = 'MOVE' if 'move' in natural_command_words else 'RENAME'
-    else:
-      tagged_command['output'] = target_tasks[0]
 
-    if tagged_command['output'] in possible_tasks:
-      tagged_commands.append(tagged_command)
 
-  return tagged_commands
+
+
+
+
+
+
+
+
+
+
+# COMMANDS = json.load(open('data/linuxcommands.json', encoding='utf-8'))
+
+# def categories() -> set[str]:
+#   return {
+#     'all',
+#     'rename',
+#     'create',
+#     'delete',
+#     'show',
+#     'change',
+#     'copy',
+#     'move',
+#     'directory',
+#     'file',
+#   }
+
+
+# def tagged_commands(categs: set[str] = {'all', }) -> list[dict[str, str]]:
+
+#   categs = { *map(str.lower, categs) }
+#   categs.intersection_update(categories())
+
+#   categ2key = {
+#     'all': [
+#       'REMOVE_DIR', 
+#       'CREATE_FILE', 
+#       'UNDEFINED', 
+#       'SHOW_FILE', 
+#       'CREATE_DIR', 
+#       'REMOVE_FILE', 
+#       'MOVE', 
+#       'RENAME', 
+#       'SHOW_DIR', 
+#       'CHANGE_DIR', 
+#       'COPY'
+#     ],
+#     'rename': ['RENAME'],
+#     'create': ['CREATE_FILE', 'CREATE_DIR'],
+#     'delete': ['REMOVE_DIR', 'REMOVE_FILE'],
+#     'show': ['SHOW_DIR', 'SHOW_FILE'],
+#     'change': ['CHANGE_DIR'],
+#     'copy': ['COPY'],
+#     'move': ['MOVE'],
+#     'directory': [
+#       'CREATE_DIR', 
+#       'SHOW_DIR', 
+#       'REMOVE_DIR', 
+#       'MOVE', 
+#       'RENAME', 
+#       'COPY', 
+#       'CHANGE_DIR'
+#     ],
+#     'file': [
+#       'CREATE_FILE', 
+#       'SHOW_FILE', 
+#       'REMOVE_FILE', 
+#       'MOVE', 
+#       'RENAME', 
+#       'COPY'
+#     ],
+#   }
+
+#   possible_tasks = list(chain(*[keywords for (categ, keywords) in categ2key.items() if categ in categs]))
+#   tagged_vocabulary = json.load(open('data/commands-vocabulary.json'))
+
+#   tagged_commands = []
+#   for command in COMMANDS:
+#     natural_command: str = command['input']
+#     source_command: str = command['output'].split(' ')[0]
+#     target_tasks: list[str] = tagged_vocabulary[source_command]
+#     tagged_command = {'input': natural_command}
+#     natural_command_words: list[str] = list(map(str.lower, natural_command.split(' ')))
+
+#     if source_command == 'sudo': 
+#       source_command = command['output'].split(' ')[1]
+
+#     if source_command == 'rm': 
+#       tagged_command['output'] = 'REMOVE_DIR' if 'directory' in natural_command_words else 'REMOVE_FILE'
+#     elif source_command == 'mv': 
+#       tagged_command['output'] = 'MOVE' if 'move' in natural_command_words else 'RENAME'
+#     else:
+#       tagged_command['output'] = target_tasks[0]
+
+#     if tagged_command['output'] in possible_tasks:
+#       tagged_commands.append(tagged_command)
+
+#   return tagged_commands

@@ -52,6 +52,7 @@ class Eve:
     feature_set = [(extract_features(sentence), tuple(sentence)) for sentence in sentences]
     self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
     self.__classifier__ = Classifier.train(self.__train_set__)
+    
 
   def classify_task(self, prompt) -> str:
     sentence = SplitTokenizer.tokenize(prompt)
