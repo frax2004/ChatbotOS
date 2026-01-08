@@ -1,5 +1,5 @@
 # NLTK
-from nltk.classify import NaiveBayesClassifier
+from nltk.classify import NaiveBayesClassifier as Classifier
 
 # Pretraining
 from chatbotos.tokenizers import SplitTokenizer
@@ -49,14 +49,14 @@ class Eve:
   def __init__(self):
     self.__tagged__ = {command['input'] : command['output'] for command in tagged_commands()}
     sentences = [command['input'].split(' ') for command in COMMANDS]
-    feature_set = [(extract_features(sentence), ' '.join(sentence)) for sentence in sentences]
-    self.__train_set__, self.__test_set__ = train_test_split(feature_set, .75)
-    self.__classifier__ = NaiveBayesClassifier.train(self.__train_set__)
+    feature_set = [(extract_features(sentence), tuple(sentence)) for sentence in sentences]
+    self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
+    self.__classifier__ = Classifier.train(self.__train_set__)
 
   def classify_task(self, prompt) -> str:
     sentence = SplitTokenizer.tokenize(prompt)
     predicted_class = self.__classifier__.classify(extract_features(sentence))
-    return self.__tagged__[predicted_class]
+    return self.__tagged__[' '.join(predicted_class)]
 
   def chat(self, input_stream = sys.stdin, output_stream = sys.stdout):
     stdin, stdout = sys.stdin, sys.stdout
@@ -89,7 +89,7 @@ class Eve:
       prompt: str = Task.user()
       if prompt == 'exit': break
       taskname = self.classify_task(prompt)
-
+      print(taskname)
       TaskType = TASKS.get(taskname)
 
       if TaskType != None:
