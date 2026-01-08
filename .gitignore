@@ -3,3 +3,4 @@
 init.bat
 /data/commands
 chatbotos/__pycache__
+/chatbotos/tasks/__pycache__
