@@ -24,6 +24,7 @@ from chatbotos.tasks.rename_task import RenameTask
 import sys
 import os
 import random
+import pickle
 
 from chatbotos.utils import similarity
 
@@ -48,24 +49,30 @@ TASKS: dict[str, type[Task]] = {
 # Per più task, per determinare l'ordine si fa pos tagging per estrarre le piu frasi in un solo prompt
 class Eve:
   def __init__(self):
-    
-    sentences: list[tuple] = []
 
-    for path in os.listdir('data\\commands\\'):
-      with open('data\\commands\\' + path, 'r') as file:
-        print(f'[START] Reading data\\commands\\{path}')
-        taskname = os.path.basename(path).split('.')[0].upper()
-        
-        while True:
-          sents = file.readlines(1024)
-          if sents == []: break
-          sentences += [(line.split(' '), taskname) for line in sents]
+    if os.path.exists('classifier.json'):
+      print("[DEBUG] File \"classifier.json\" exists\nCreating Classifier...")
+      with open('classifier.json', 'rb') as file:
+        self.__classifier__ = pickle.load(file)  
+      print("[DEBUG] Classifier ready")
+    else: 
+      sentences: list[tuple] = []
 
-        print(f'[FINISH] data\\commands\\{path} Read')
+      for path in os.listdir('data\\commands\\'):
+        with open('data\\commands\\' + path, 'r') as file:
+          print(f'[START] Reading data\\commands\\{path}')
+          taskname = os.path.basename(path).split('.')[0].upper()
+          
+          while True:
+            sents = file.readlines(1024)
+            if sents == []: break
+            sentences += [(line.split(' '), taskname) for line in sents]
 
-    feature_set = [(extract_features(sentence), taskname) for (sentence, taskname) in sentences]
-    self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
-    self.__classifier__ = Classifier.train(self.__train_set__)
+          print(f'[FINISH] data\\commands\\{path} Read')
+
+      feature_set = [(extract_features(sentence), taskname) for (sentence, taskname) in sentences]
+      self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
+      self.__classifier__ = Classifier.train(self.__train_set__)
 
 
   def classify_task(self, prompt) -> str:

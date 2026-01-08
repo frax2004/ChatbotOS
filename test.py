@@ -29,12 +29,12 @@ from chatbotos.pretrain import extract_features, train_test_split
 from chatbotos.datasets import CONTEXT_FREE_GRAMMARS, generate
 import os
 
-# for command, grammar in CONTEXT_FREE_GRAMMARS.items():
-#   with open(f'data\\commands\\{command.lower()}.command', 'w') as file:
-#     print(f'[START] Compiling data\\commands\\{command.lower()}.commands')
-#     strings = [' '.join(string) + '\n' for string in generate(grammar)]
-#     file.writelines(random.choices(strings, k = int(round(len(strings)*.15))))
-#     print(f'[FINISH] Compiled data\\commands\\{command.lower()}.commands')
+for command, grammar in CONTEXT_FREE_GRAMMARS.items():
+  with open(f'data\\commands\\{command.lower()}.command', 'w') as file:
+    print(f'[START] Compiling data\\commands\\{command.lower()}.commands')
+    strings = [' '.join(string) + '\n' for string in generate(grammar)]
+    file.writelines(random.choices(strings, k = int(round(len(strings)*.07))))
+    print(f'[FINISH] Compiled data\\commands\\{command.lower()}.commands')
     
 
 sentences: list[tuple] = []
@@ -59,7 +59,7 @@ print("[TRAINING] finish")
 
 import pickle
 
-with open('classifier.json', 'w') as file:
+with open('classifier.json', 'wb') as file:
   print("[SAVING] start")
   pickle.dump(__classifier__, file)
   print("[SAVING] end")
