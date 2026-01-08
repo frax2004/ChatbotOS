@@ -4,7 +4,8 @@ from nltk.classify import NaiveBayesClassifier as Classifier
 # Pretraining
 from chatbotos.tokenizers import SplitTokenizer
 from chatbotos.pretrain import train_test_split, extract_features
-from chatbotos.datasets import COMMANDS, tagged_commands
+# from chatbotos.datasets import COMMANDS, tagged_commands
+
 
 # Tasks
 from chatbotos.tasks.task import Task
@@ -47,17 +48,30 @@ TASKS: dict[str, type[Task]] = {
 # Per più task, per determinare l'ordine si fa pos tagging per estrarre le piu frasi in un solo prompt
 class Eve:
   def __init__(self):
-    self.__tagged__ = {command['input'] : command['output'] for command in tagged_commands()}
-    sentences = [command['input'].split(' ') for command in COMMANDS]
-    feature_set = [(extract_features(sentence), tuple(sentence)) for sentence in sentences]
+    
+    sentences: list[tuple] = []
+
+    for path in os.listdir('data\\commands\\'):
+      with open('data\\commands\\' + path, 'r') as file:
+        print(f'[START] Reading data\\commands\\{path}')
+        taskname = os.path.basename(path).split('.')[0].upper()
+        
+        while True:
+          sents = file.readlines(1024)
+          if sents == []: break
+          sentences += [(line.split(' '), taskname) for line in sents]
+
+        print(f'[FINISH] data\\commands\\{path} Read')
+
+    feature_set = [(extract_features(sentence), taskname) for (sentence, taskname) in sentences]
     self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
     self.__classifier__ = Classifier.train(self.__train_set__)
-    
+
 
   def classify_task(self, prompt) -> str:
     sentence = SplitTokenizer.tokenize(prompt)
     predicted_class = self.__classifier__.classify(extract_features(sentence))
-    return self.__tagged__[' '.join(predicted_class)]
+    return predicted_class
 
   def chat(self, input_stream = sys.stdin, output_stream = sys.stdout):
     stdin, stdout = sys.stdin, sys.stdout
