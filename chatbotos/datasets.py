@@ -30,7 +30,7 @@ DIR = """
 """  
 
 
-REMAME_GRAMMAR = f"""
+REMAME_PRODUCTION_RULES = f"""
   RENAME -> VERB SPECIFIER FILE_OR_DIR ENDING
   
   {FILE}
@@ -45,7 +45,7 @@ REMAME_GRAMMAR = f"""
 """
 
 # TODO Verificare che le tre flag create directory e file poste a true non diano problemi
-CREATE_FILE_GRAMMAR = f"""
+CREATE_FILE_PRODUCTION_RULES = f"""
   CREATE -> VERB SPECIFIER NEW FILE ENDING
   
   NEW -> "new" |
@@ -61,7 +61,7 @@ CREATE_FILE_GRAMMAR = f"""
   VERB -> "create" | "make" | "generate" | "build" | "construct" | "spawn" | "produce" | "setup" | "instantiate" | "touch" | "mkfile" | "new" | "add" | "write" | "form" | "compose" | "allocate" | "initiate"
 """
 
-CREATE_DIRECTORY_GRAMMAR = f"""
+CREATE_DIRECTORY_PRODUCTION_RULES = f"""
   CREATE -> VERB SPECIFIER NEW DIR ENDING
   
   NEW -> "new" |
@@ -76,7 +76,7 @@ CREATE_DIRECTORY_GRAMMAR = f"""
   VERB -> "create" | "make" | "generate" | "build" | "construct" | "spawn" | "produce" | "setup" | "instantiate" | "touch" | "mkdir" | "md" | "new" | "add" | "write" | "form" | "compose" | "allocate" | "initiate"
 """
 
-DELETE_FILE_GRAMMAR = f"""
+DELETE_FILE_PRODUCTION_RULES = f"""
   DELETE -> VERB SPECIFIER FILE ENDING
 
   {FILE}
@@ -92,7 +92,7 @@ DELETE_FILE_GRAMMAR = f"""
 
 """
 
-DELETE_DIRECTORY_GRAMMAR = f"""
+DELETE_DIRECTORY_PRODUCTION_RULES = f"""
   DELETE -> VERB SPECIFIER DIR ENDING RECURSIVELY
 
   {FILE}
@@ -107,7 +107,7 @@ DELETE_DIRECTORY_GRAMMAR = f"""
   VERB -> "delete" | "remove" | "erase" | "destroy" | "kill" | "rm" | "del" | "rmdir" | "wipe" | "clear" | "trash" | "discard" | "terminate" | "eliminate" | "scrap" | "cancel" | "drop" | "unlink" | "expunge" | "obliterate" | "bin"
 """
 
-SHOW_FILE_GRAMMAR = f"""
+SHOW_FILE_PRODUCTION_RULES = f"""
   SHOW -> VERB SPECIFIER FILE NAMING NOUN ENDING 
   ENDING -> TO NOUN | TO DIR NAMING NOUN | 
   
@@ -121,7 +121,7 @@ SHOW_FILE_GRAMMAR = f"""
   VERB -> "show" | "display" | "view" | "cat" | "type" | "print" | "echo" | "read" | "see" | "reveal" | "look" | "check" | "inspect" | "examine" | "output"
 """
 
-SHOW_DIRECTORY_GRAMMAR = f"""
+SHOW_DIRECTORY_PRODUCTION_RULES = f"""
   SHOW -> VERB SPECIFIER DIR NAMING NOUN ENDING 
   ENDING -> TO NOUN | TO DIR NAMING NOUN |
   
@@ -134,7 +134,7 @@ SHOW_DIRECTORY_GRAMMAR = f"""
   VERB -> "show" | "display" | "view" | "list" | "ls" | "dir" | "cat" | "type" | "print" | "echo" | "read" | "see" | "reveal" | "look" | "check" | "inspect" | "examine" | "output" | "listout"
 """
 
-CHANGE_DIRECTORY_GRAMMAR = f"""
+CHANGE_DIRECTORY_PRODUCTION_RULES = f"""
   CHANGE -> VERB TO DIR NOUN | VERB TO NOUN
 
   {NOUN}
@@ -144,7 +144,7 @@ CHANGE_DIRECTORY_GRAMMAR = f"""
   VERB -> "change" | "modify" | "alter" | "switch" | "swap" | "set" | "cd"  | "shift" | "go" | "put yourself"
 """
 
-COPY_GRAMMAR = f"""
+COPY_PRODUCTION_RULES = f"""
   COPY -> VERB SPECIFIER FILE_OR_DIR MID ENDING
 
   {FILE}
@@ -162,7 +162,7 @@ COPY_GRAMMAR = f"""
 
 """
 
-MOVE_GRAMMAR = f"""
+MOVE_PRODUCTION_RULES = f"""
   MOVE -> VERB SPECIFIER FILE_OR_DIR MID ENDING
 
   {FILE}
@@ -179,17 +179,30 @@ MOVE_GRAMMAR = f"""
   VERB -> "move" | "mv" | "relocate" | "transfer" | "shift" | "displace" | "reposition" | "migrate" | "migration" | "transport" | "cut" | "paste" | "place" | "put" | "redirect" | "reroute" | "rearrange" | "reorganize" | "drag" | "drop"  | "carry" | "pathing" | "transferring"
 """
 
-GRAMMARS: dict[str, str] = {
-  "REMAME" : REMAME_GRAMMAR,
-  "CREATE_FILE" : CREATE_FILE_GRAMMAR,
-  "CREATE_DIRECTORY" : CREATE_DIRECTORY_GRAMMAR,
-  "DELETE_FILE" : DELETE_FILE_GRAMMAR,
-  "DELETE_DIRECTORY" : DELETE_DIRECTORY_GRAMMAR,
-  "SHOW_FILE" : SHOW_FILE_GRAMMAR,
-  "SHOW_DIRECTORY" : SHOW_DIRECTORY_GRAMMAR,
-  "CHANGE_DIRECTORY" : CHANGE_DIRECTORY_GRAMMAR,
-  "COPY" : COPY_GRAMMAR,
-  "MOVE" : MOVE_GRAMMAR,
+PRODUCTION_RULES: dict[str, str] = {
+  "REMAME" : REMAME_PRODUCTION_RULES,
+  "CREATE_FILE" : CREATE_FILE_PRODUCTION_RULES,
+  "CREATE_DIRECTORY" : CREATE_DIRECTORY_PRODUCTION_RULES,
+  "DELETE_FILE" : DELETE_FILE_PRODUCTION_RULES,
+  "DELETE_DIRECTORY" : DELETE_DIRECTORY_PRODUCTION_RULES,
+  "SHOW_FILE" : SHOW_FILE_PRODUCTION_RULES,
+  "SHOW_DIRECTORY" : SHOW_DIRECTORY_PRODUCTION_RULES,
+  "CHANGE_DIRECTORY" : CHANGE_DIRECTORY_PRODUCTION_RULES,
+  "COPY" : COPY_PRODUCTION_RULES,
+  "MOVE" : MOVE_PRODUCTION_RULES,
+}
+
+CONTEXT_FREE_PRODUCTION_RULESS: dict[str, CFG] = {
+  "REMAME": CFG.fromstring(REMAME_PRODUCTION_RULES),
+  "CREATE_FILE": CFG.fromstring(CREATE_FILE_PRODUCTION_RULES),
+  "CREATE_DIRECTORY": CFG.fromstring(CREATE_DIRECTORY_PRODUCTION_RULES),
+  "DELETE_FILE": CFG.fromstring(DELETE_FILE_PRODUCTION_RULES),
+  "DELETE_DIRECTORY": CFG.fromstring(DELETE_DIRECTORY_PRODUCTION_RULES),
+  "SHOW_FILE": CFG.fromstring(SHOW_FILE_PRODUCTION_RULES),
+  "SHOW_DIRECTORY": CFG.fromstring(SHOW_DIRECTORY_PRODUCTION_RULES),
+  "CHANGE_DIRECTORY": CFG.fromstring(CHANGE_DIRECTORY_PRODUCTION_RULES),
+  "COPY": CFG.fromstring(COPY_PRODUCTION_RULES),
+  "MOVE": CFG.fromstring(MOVE_PRODUCTION_RULES),
 }
 
 
