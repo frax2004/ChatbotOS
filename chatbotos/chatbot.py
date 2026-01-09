@@ -4,8 +4,6 @@ from nltk.classify import NaiveBayesClassifier as Classifier
 # Pretraining
 from chatbotos.tokenizers import SplitTokenizer
 from chatbotos.pretrain import train_test_split, extract_features
-# from chatbotos.datasets import COMMANDS, tagged_commands
-
 
 # Tasks
 from chatbotos.tasks.task import Task
@@ -50,18 +48,18 @@ TASKS: dict[str, type[Task]] = {
 class Eve:
   def __init__(self):
 
-    if os.path.exists('classifier.json'):
-      print("[DEBUG] File \"classifier.json\" exists\nCreating Classifier...")
-      with open('classifier.json', 'rb') as file:
-        self.__classifier__ = pickle.load(file)  
-      print("[DEBUG] Classifier ready")
+    if os.path.exists('classifier.pickle'):
+      print("[\033[38;2;180;20;210mDEBUG\033[0m] Creating Classifier...")
+      with open('classifier.pickle', 'rb') as file:
+        self.__classifier__ = pickle.load(file)
+      print("[\033[38;2;180;20;210mDEBUG\033[0m] Classifier ready")
+
     else: 
       sentences: list[tuple] = []
-
       for path in os.listdir('data\\commands\\'):
         with open('data\\commands\\' + path, 'r') as file:
           print(f'[START] Reading data\\commands\\{path}')
-          taskname = os.path.basename(path).split('.')[0].upper()
+          taskname = os.path.basename(path).upper()
           
           while True:
             sents = file.readlines(1024)
@@ -111,7 +109,6 @@ class Eve:
       prompt: str = Task.user()
       if prompt == 'exit': break
       taskname = self.classify_task(prompt)
-      print(taskname)
       TaskType = TASKS.get(taskname)
 
       if TaskType != None:

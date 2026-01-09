@@ -3,6 +3,94 @@ from itertools import chain
 from nltk.grammar import CFG
 from nltk.parse.generate import generate
 
+
+####################################################################################################
+####################################################################################################
+#######                                      KEYWORDS                                        #######
+####################################################################################################
+####################################################################################################
+
+
+
+RENAME_KEYWORDS: tuple = (
+  'rename', 'renaming', 'renamed',
+  'modify', 'modifying', 'modified',
+  'update', 'updating', 'updated',
+  'replace', 'replacing',
+  'relabel', 'relabeling',
+  'retitle', 'retitled', 'ren'
+)
+
+CREATE_KEYWORDS: tuple = (
+  'create', 'make', 'generate', 'build', 'construct', 'spawn', 'produce', 
+  'initiate', 'setup', 'instantiate', 'touch', 'mkdir', 'mkfile', 'md', 
+  'new', 'add', 'addition', 'start', 'write', 'launch', 'establish', 
+  'form', 'compose', 'allocate'
+)
+
+DIRECTORY_KEYWORDS: tuple = (
+  'directory', 'folder', 'path', 'subdir', 'subdirectory', 'dir', 
+  'cd', 'ls', 'pwd', 'tree', 'location', 'root', 
+  'home', 'destination', 'source', 'mount', 'volume', 'pathname',
+  'folderpath', 'filepath'
+)
+
+FILE_KEYWORDS: tuple = (
+  'file', 'files', 'filename', 'document', 'doc', 'docs', 'text', 'txt',
+  'script', 'log', 'logs', 'image', 'img', 'photo', 'data', 'pdf', 
+  'archive', 'zip', 'item', 'object', 'attachment', 'extension', 'ext',
+  'binary', 'executable', 'exe', 'readme', 'manifest', 'content',
+  'filepath', 'basename'
+)
+
+DELETE_KEYWORDS: tuple = (
+  'delete', 'remove', 'erase', 'destroy', 'kill', 'purge', 'rm', 'del',
+  'rmdir', 'wipe', 'clear', 'trash', 'discard', 'terminate', 'eliminate',
+  'scrap', 'cancel', 'drop', 'unlink', 'expunge', 'cleanup', 'clean',
+  'obliterate', 'uninstall', 'bin'
+)
+
+SHOW_KEYWORDS: tuple = (
+  'show', 'display', 'view', 'list', 'ls', 'dir', 'cat', 'type', 'print', 
+  'echo', 'read', 'see', 'reveal', 'look', 'check', 'inspect', 'examine', 
+  'find', 'locate', 'grep', 'tree', 'more', 'less', 'head', 'tail', 
+  'stat', 'status', 'info', 'information', 'contents', 'details', 
+  'output', 'map', 'listout'
+)
+
+CHANGE_KEYWORDS: tuple = (
+  'change', 'alter', 'edit', 'switch', 'swap', 
+  'convert', 'set', 'reset', 'adjust', 'configure', 'tweak', 
+  'toggle', 'cd', 'chmod', 'chown', 
+  'passwd', 'transform', 'reconfigure', 'go'
+)
+
+COPY_KEYWORDS: tuple = (
+  'copy', 'cp', 'scp', 'duplicate', 'replicate', 'clone', 'backup', 
+  'mirror', 'xcopy', 'robocopy', 'rsync', 'reproduce', 'snapshot', 
+  'sync', 'synchronize', 'multiply', 'reproduction', 
+  'cloning', 'duplication', 'back-up'
+)
+
+MOVE_KEYWORDS: tuple = (
+  'move', 'mv', 'relocate', 'transfer', 'shift', 'displace', 'reposition', 
+  'migrate', 'migration', 'transport', 'cut', 'paste', 'place', 'put', 
+  'redirect', 'reroute', 'rearrange', 'reorganize', 'drag', 
+  'carry', 'pathing', 'transferring'
+)
+
+KEYWORDS: dict[str, list[str]] = {
+  'RENAME': RENAME_KEYWORDS,
+  'CREATE': CREATE_KEYWORDS,
+  'DIRECTORY': DIRECTORY_KEYWORDS,
+  'FILE': FILE_KEYWORDS,
+  'DELETE': DELETE_KEYWORDS,
+  'SHOW': SHOW_KEYWORDS,
+  'CHANGE': CHANGE_KEYWORDS,
+  'COPY': COPY_KEYWORDS,
+  'MOVE': MOVE_KEYWORDS
+}
+
 ####################################################################################################
 ####################################################################################################
 #######                                      GRAMMARS                                        #######
@@ -41,7 +129,8 @@ RENAME_PRODUCTION_RULES = f"""
 
   ENDING -> TO NOUN |
   TO -> "to" | "as" | "into" | "in"
-  VERB -> "rename" | "renaming" | "renamed" | "change" | "changing" | "changed" | "updating" | "updated" | "modify" | "modifying" | "modified" | "update" | "alter" | "altering" | "replace"  | "replacing" | "relabel"  | "relabeling" | "retitle"  | "retitled" | "ren"
+  VERB -> {' | '.join(['"' + key + '"' for key in RENAME_KEYWORDS])}
+
 """
 
 # TODO Verificare che le tre flag create directory e file poste a true non diano problemi
@@ -58,7 +147,8 @@ CREATE_FILE_PRODUCTION_RULES = f"""
   ENDING -> NAMING NOUN | NAMING NOUN TO DIR NOUN | TO NOUN |
   TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
   NAMING -> "named" | "called" | "known as" | "a.k.a"
-  VERB -> "create" | "make" | "generate" | "build" | "construct" | "spawn" | "produce" | "setup" | "instantiate" | "touch" | "mkfile" | "new" | "add" | "write" | "form" | "compose" | "allocate" | "initiate"
+  VERB -> {' | '.join(['"' + key + '"' for key in CREATE_KEYWORDS])}
+
 """
 
 CREATE_DIR_PRODUCTION_RULES = f"""
@@ -73,7 +163,8 @@ CREATE_DIR_PRODUCTION_RULES = f"""
   ENDING -> NAMING NOUN | NAMING NOUN TO DIR NOUN | TO NOUN |
   TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
   NAMING -> "named" | "called" | "known as" | "a.k.a"
-  VERB -> "create" | "make" | "generate" | "build" | "construct" | "spawn" | "produce" | "setup" | "instantiate" | "touch" | "mkdir" | "md" | "new" | "add" | "write" | "form" | "compose" | "allocate" | "initiate"
+  VERB -> {' | '.join(['"' + key + '"' for key in CREATE_KEYWORDS])}
+
 """
 
 DELETE_FILE_PRODUCTION_RULES = f"""
@@ -88,7 +179,7 @@ DELETE_FILE_PRODUCTION_RULES = f"""
   ENDING -> FROM NOUN | FROM DIR NAMING NOUN |
   NAMING -> "named" | "called" | "known as" | "a.k.a"
   FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
-  VERB -> "delete" | "remove" | "erase" | "destroy" | "kill" | "rm" | "del" | "wipe" | "clear" | "trash" | "discard" | "terminate" | "eliminate" | "scrap" | "cancel" | "drop" | "unlink" | "expunge" | "obliterate" | "bin"
+  VERB -> {' | '.join(['"' + key + '"' for key in DELETE_KEYWORDS])}
 
 """
 
@@ -104,7 +195,8 @@ DELETE_DIR_PRODUCTION_RULES = f"""
   ENDING -> FROM NOUN | FROM DIR NAMING NOUN |
   NAMING -> "named" | "called" | "known as" | "a.k.a"
   FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
-  VERB -> "delete" | "remove" | "erase" | "destroy" | "kill" | "rm" | "del" | "rmdir" | "wipe" | "clear" | "trash" | "discard" | "terminate" | "eliminate" | "scrap" | "cancel" | "drop" | "unlink" | "expunge" | "obliterate" | "bin"
+  VERB -> {' | '.join(['"' + key + '"' for key in DELETE_KEYWORDS])}
+
 """
 
 SHOW_FILE_PRODUCTION_RULES = f"""
@@ -118,7 +210,7 @@ SHOW_FILE_PRODUCTION_RULES = f"""
 
   TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in" | "located at" | "located in" | "from"
   NAMING -> "named" | "called" | "known as" | "a.k.a"
-  VERB -> "show" | "display" | "view" | "cat" | "type" | "print" | "echo" | "read" | "see" | "reveal" | "look" | "check" | "inspect" | "examine" | "output"
+  VERB -> {' | '.join(['"' + key + '"' for key in SHOW_KEYWORDS])}
 """
 
 SHOW_DIR_PRODUCTION_RULES = f"""
@@ -131,7 +223,7 @@ SHOW_DIR_PRODUCTION_RULES = f"""
 
   TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
   NAMING -> "named" | "called" | "known as" | "a.k.a"
-  VERB -> "show" | "display" | "view" | "list" | "ls" | "dir" | "cat" | "type" | "print" | "echo" | "read" | "see" | "reveal" | "look" | "check" | "inspect" | "examine" | "output" | "listout"
+  VERB -> {' | '.join(['"' + key + '"' for key in SHOW_KEYWORDS])}
 """
 
 CHANGE_DIR_PRODUCTION_RULES = f"""
@@ -141,7 +233,7 @@ CHANGE_DIR_PRODUCTION_RULES = f"""
   {DIR}
 
   TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in" | 
-  VERB -> "change" | "modify" | "alter" | "switch" | "swap" | "set" | "cd"  | "shift" | "go" | "put yourself"
+  VERB -> {' | '.join(['"' + key + '"' for key in CHANGE_KEYWORDS])}
 """
 
 COPY_PRODUCTION_RULES = f"""
@@ -158,7 +250,7 @@ COPY_PRODUCTION_RULES = f"""
   NAMING -> "named" | "called" | "known as" | "a.k.a" |
   FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
   TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
-  VERB -> "copy" | "cp" | "scp" | "duplicate" | "replicate" | "clone" | "backup"  | "mirror" | "xcopy" | "robocopy" | "reproduce" | "snapshot" | "sync" | "synchronize" | "transfer" | "multiply" | "reproduct" | "reproduction" | "back-up"
+  VERB -> {' | '.join(['"' + key + '"' for key in COPY_KEYWORDS])}
 
 """
 
@@ -176,7 +268,8 @@ MOVE_PRODUCTION_RULES = f"""
   NAMING -> "named" | "called" | "known as" | "a.k.a" |
   FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
   TO -> "into" | "in" | "at" | "inside" | "within" | "@" | "contained in"
-  VERB -> "move" | "mv" | "relocate" | "transfer" | "shift" | "displace" | "reposition" | "migrate" | "migration" | "transport" | "cut" | "paste" | "place" | "put" | "redirect" | "reroute" | "rearrange" | "reorganize" | "drag" | "drop"  | "carry" | "pathing" | "transferring"
+  VERB -> {' | '.join(['"' + key + '"' for key in MOVE_KEYWORDS])}
+
 """
 
 PRODUCTION_RULES: dict[str, str] = {
@@ -206,94 +299,7 @@ CONTEXT_FREE_GRAMMARS: dict[str, CFG] = {
 }
 
 
-####################################################################################################
-####################################################################################################
-#######                                      KEYWORDS                                        #######
-####################################################################################################
-####################################################################################################
 
-
-
-RENAME_KEYWORDS: tuple = (
-  'rename', 'renaming', 'renamed',
-  'change', 'changing', 'changed',
-  'modify', 'modifying', 'modified',
-  'update', 'updating', 'updated',
-  'alter', 'altering',
-  'replace', 'replacing',
-  'relabel', 'relabeling',
-  'retitle', 'retitled'
-)
-
-CREATE_KEYWORDS: tuple = (
-  'create', 'make', 'generate', 'build', 'construct', 'spawn', 'produce', 
-  'initiate', 'setup', 'instantiate', 'touch', 'mkdir', 'mkfile', 'md', 
-  'new', 'add', 'addition', 'start', 'write', 'launch', 'establish', 
-  'form', 'compose', 'allocate'
-)
-
-DIRECTORY_KEYWORDS: tuple = (
-  'directory', 'folder', 'path', 'subdir', 'subdirectory', 'dir', 
-  'mkdir', 'md', 'cd', 'ls', 'pwd', 'tree', 'location', 'root', 
-  'home', 'destination', 'source', 'mount', 'volume', 'pathname',
-  'folderpath', 'filepath'
-)
-
-FILE_KEYWORDS: tuple = (
-  'file', 'files', 'filename', 'document', 'doc', 'docs', 'text', 'txt',
-  'script', 'log', 'logs', 'image', 'img', 'photo', 'data', 'pdf', 
-  'archive', 'zip', 'item', 'object', 'attachment', 'extension', 'ext',
-  'binary', 'bin', 'executable', 'exe', 'readme', 'manifest', 'content',
-  'filepath', 'basename'
-)
-
-DELETE_KEYWORDS: tuple = (
-  'delete', 'remove', 'erase', 'destroy', 'kill', 'purge', 'rm', 'del',
-  'rmdir', 'wipe', 'clear', 'trash', 'discard', 'terminate', 'eliminate',
-  'scrap', 'cancel', 'drop', 'unlink', 'expunge', 'cleanup', 'clean',
-  'obliterate', 'uninstall', 'bin'
-)
-
-SHOW_KEYWORDS: tuple = (
-  'show', 'display', 'view', 'list', 'ls', 'dir', 'cat', 'type', 'print', 
-  'echo', 'read', 'see', 'reveal', 'look', 'check', 'inspect', 'examine', 
-  'find', 'locate', 'grep', 'tree', 'more', 'less', 'head', 'tail', 
-  'stat', 'status', 'info', 'information', 'contents', 'details', 
-  'output', 'map', 'listout'
-)
-
-CHANGE_KEYWORDS: tuple = (
-  'change', 'modify', 'alter', 'update', 'edit', 'switch', 'swap', 
-  'replace', 'convert', 'set', 'reset', 'adjust', 'configure', 'tweak', 
-  'toggle', 'cd', 'chmod', 'chown', 'chgrp', 'chsh', 'su', 'sudo', 
-  'passwd', 'transform', 'reconfigure', 'shift', 'move'
-)
-
-COPY_KEYWORDS: tuple = (
-  'copy', 'cp', 'scp', 'duplicate', 'replicate', 'clone', 'backup', 
-  'mirror', 'xcopy', 'robocopy', 'rsync', 'reproduce', 'snapshot', 
-  'sync', 'synchronize', 'transfer', 'multiply', 'reproduction', 
-  'cloning', 'duplication', 'back-up'
-)
-
-MOVE_KEYWORDS: tuple = (
-  'move', 'mv', 'relocate', 'transfer', 'shift', 'displace', 'reposition', 
-  'migrate', 'migration', 'transport', 'cut', 'paste', 'place', 'put', 
-  'redirect', 'reroute', 'rearrange', 'reorganize', 'drag', 'drop', 
-  'carry', 'pathing', 'transferring'
-)
-
-KEYWORDS: dict[str, list[str]] = {
-  'RENAME': RENAME_KEYWORDS,
-  'CREATE': CREATE_KEYWORDS,
-  'DIRECTORY': DIRECTORY_KEYWORDS,
-  'FILE': FILE_KEYWORDS,
-  'DELETE': DELETE_KEYWORDS,
-  'SHOW': SHOW_KEYWORDS,
-  'CHANGE': CHANGE_KEYWORDS,
-  'COPY': COPY_KEYWORDS,
-  'MOVE': MOVE_KEYWORDS
-}
 
 
 
