@@ -43,7 +43,7 @@ FILE_KEYWORDS: tuple = (
   'filepath', 'basename'
 )
 
-DELETE_KEYWORDS: tuple = (
+REMOVE_KEYWORDS: tuple = (
   'delete', 'remove', 'erase', 'destroy', 'kill', 'purge', 'rm', 'del',
   'rmdir', 'wipe', 'clear', 'trash', 'discard', 'terminate', 'eliminate',
   'scrap', 'cancel', 'drop', 'unlink', 'expunge', 'cleanup', 'clean',
@@ -84,7 +84,7 @@ KEYWORDS: dict[str, list[str]] = {
   'CREATE': CREATE_KEYWORDS,
   'DIRECTORY': DIRECTORY_KEYWORDS,
   'FILE': FILE_KEYWORDS,
-  'DELETE': DELETE_KEYWORDS,
+  'DELETE': REMOVE_KEYWORDS,
   'SHOW': SHOW_KEYWORDS,
   'CHANGE': CHANGE_KEYWORDS,
   'COPY': COPY_KEYWORDS,
@@ -167,7 +167,7 @@ CREATE_DIR_PRODUCTION_RULES = f"""
 
 """
 
-DELETE_FILE_PRODUCTION_RULES = f"""
+REMOVE_FILE_PRODUCTION_RULES = f"""
   DELETE -> VERB SPECIFIER FILE ENDING
 
   {FILE}
@@ -179,11 +179,11 @@ DELETE_FILE_PRODUCTION_RULES = f"""
   ENDING -> FROM NOUN | FROM DIR NAMING NOUN |
   NAMING -> "named" | "called" | "known as" | "a.k.a"
   FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
-  VERB -> {' | '.join(['"' + key + '"' for key in DELETE_KEYWORDS])}
+  VERB -> {' | '.join(['"' + key + '"' for key in REMOVE_KEYWORDS])}
 
 """
 
-DELETE_DIR_PRODUCTION_RULES = f"""
+REMOVE_DIR_PRODUCTION_RULES = f"""
   DELETE -> VERB SPECIFIER DIR ENDING RECURSIVELY
 
   {FILE}
@@ -195,7 +195,7 @@ DELETE_DIR_PRODUCTION_RULES = f"""
   ENDING -> FROM NOUN | FROM DIR NAMING NOUN |
   NAMING -> "named" | "called" | "known as" | "a.k.a"
   FROM -> "from" | "from within" | "inside" | "within" | "@" | "contained in" | "at" | "found in" | "located" | "located at" | "in"
-  VERB -> {' | '.join(['"' + key + '"' for key in DELETE_KEYWORDS])}
+  VERB -> {' | '.join(['"' + key + '"' for key in REMOVE_KEYWORDS])}
 
 """
 
@@ -276,8 +276,8 @@ PRODUCTION_RULES: dict[str, str] = {
   "RENAME" : RENAME_PRODUCTION_RULES,
   "CREATE_FILE" : CREATE_FILE_PRODUCTION_RULES,
   "CREATE_DIR" : CREATE_DIR_PRODUCTION_RULES,
-  "DELETE_FILE" : DELETE_FILE_PRODUCTION_RULES,
-  "DELETE_DIR" : DELETE_DIR_PRODUCTION_RULES,
+  "REMOVE_FILE" : REMOVE_FILE_PRODUCTION_RULES,
+  "REMOVE_DIR" : REMOVE_DIR_PRODUCTION_RULES,
   "SHOW_FILE" : SHOW_FILE_PRODUCTION_RULES,
   "SHOW_DIR" : SHOW_DIR_PRODUCTION_RULES,
   "CHANGE_DIR" : CHANGE_DIR_PRODUCTION_RULES,
@@ -289,8 +289,8 @@ CONTEXT_FREE_GRAMMARS: dict[str, CFG] = {
   "RENAME": CFG.fromstring(RENAME_PRODUCTION_RULES),
   "CREATE_FILE": CFG.fromstring(CREATE_FILE_PRODUCTION_RULES),
   "CREATE_DIR": CFG.fromstring(CREATE_DIR_PRODUCTION_RULES),
-  "DELETE_FILE": CFG.fromstring(DELETE_FILE_PRODUCTION_RULES),
-  "DELETE_DIR": CFG.fromstring(DELETE_DIR_PRODUCTION_RULES),
+  "REMOVE_FILE": CFG.fromstring(REMOVE_FILE_PRODUCTION_RULES),
+  "REMOVE_DIR": CFG.fromstring(REMOVE_DIR_PRODUCTION_RULES),
   "SHOW_FILE": CFG.fromstring(SHOW_FILE_PRODUCTION_RULES),
   "SHOW_DIR": CFG.fromstring(SHOW_DIR_PRODUCTION_RULES),
   "CHANGE_DIR": CFG.fromstring(CHANGE_DIR_PRODUCTION_RULES),

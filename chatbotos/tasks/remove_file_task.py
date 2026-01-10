@@ -31,3 +31,10 @@ class RemoveFileTask(Task):
 
   def build(self) -> str:
     return "del /f {}".format(self['file name'].field)
+
+  def execute(self) -> None:
+    path = self['file name'].field
+    if os.path.exists(path):
+      os.remove(self['file name'].field)
+    else:
+      Task.error('File to remove {} does not exist'.format(path))

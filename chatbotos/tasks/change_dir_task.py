@@ -39,3 +39,6 @@ class ChangeDirTask(Task):
     return "cd {}".format(
       self['directory'].field
     )
+
+  def execute(self):
+    os.chdir(self['directory'].field)

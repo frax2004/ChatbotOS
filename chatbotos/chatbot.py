@@ -2,7 +2,7 @@
 from nltk.classify import NaiveBayesClassifier as Classifier
 
 # Pretraining
-from chatbotos.tokenizers import SplitTokenizer
+from chatbotos.tokenizers import DefaultTokenizer, SentenceTokenizer
 from chatbotos.pretrain import train_test_split, extract_features
 
 # Tasks
@@ -49,10 +49,10 @@ class Eve:
   def __init__(self):
 
     if os.path.exists('classifier.pickle'):
-      print("[\033[38;2;180;20;210mDEBUG\033[0m] Creating Classifier...")
+      Task.debug("Creating Classifier...")
       with open('classifier.pickle', 'rb') as file:
         self.__classifier__ = pickle.load(file)
-      print("[\033[38;2;180;20;210mDEBUG\033[0m] Classifier ready")
+      Task.debug("Classifier ready")
 
     else: 
       sentences: list[tuple] = []
@@ -74,7 +74,7 @@ class Eve:
 
 
   def classify_task(self, prompt) -> str:
-    sentence = SplitTokenizer.tokenize(prompt)
+    sentence = DefaultTokenizer.tokenize(prompt)
     predicted_class = self.__classifier__.classify(extract_features(sentence))
     return predicted_class
 
@@ -87,6 +87,14 @@ class Eve:
       'Hi there, how can i help you today?',
       'What can i do today for you?',
       'Welcome back user, what do we do?'
+    )
+
+    rejection_responses = (
+      "Sorry i didn't understand what to do",
+      "I don't understand the task",
+      "Be more precise",
+      "I can't do this",
+      "Sorry, i am not supposed to do this"
     )
 
     mid_responses = (
@@ -120,7 +128,12 @@ class Eve:
         answer = Task.user()
 
         if similarity('yes', answer.split(' ')) > .8: 
-          os.system(command)
+          task.execute()
+      else:
+        Task.error('Unkown task "{}"'.format(taskname))
+        response = random.choice(rejection_responses)
+        Task.reply(response)
+
       
       response = random.choice(mid_responses)
       Task.reply(response)

@@ -64,3 +64,12 @@ class RenameTask(Task):
       self['target name'].field
     )
     
+  def execute(self) -> None:
+    source_path = self['source file'].field
+    target_path = self['target name'].field
+    if not (os.path.exists(source_path) and os.path.isfile(source_path)):
+      Task.error('File {} to rename does not exist'.format())
+    elif os.path.exists(target_path):
+      Task.error('File {} already exists'.format(target_path))
+    else:
+      os.rename(self['source file'].field, self['target name'].field)

@@ -1,5 +1,6 @@
 from chatbotos.tasks.task import Task
 import os
+import shutil as shell
 
 class ShowDirTask(Task):
   def __init__(self):
@@ -36,3 +37,12 @@ class ShowDirTask(Task):
     return "dir {}".format(
       self['directory'].field
     )
+
+  def execute(self) -> None:
+    path = self['directory'].field
+    if os.path.exists(path) and os.path.isdir(path):
+      print(self['directory'].field)
+      for path in os.listdir(self['directory'].field):
+        print('\t' + path)
+    else:
+      Task.error('Directory "{}" does not exist'.format(path))
