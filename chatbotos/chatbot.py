@@ -2,7 +2,7 @@
 from nltk.classify import NaiveBayesClassifier as Classifier
 
 # Pretraining
-from chatbotos.tokenizers import DefaultTokenizer, SentenceTokenizer
+from chatbotos.tokenizers import DefaultTokenizer
 from chatbotos.pretrain import train_test_split, extract_features
 
 # Tasks
