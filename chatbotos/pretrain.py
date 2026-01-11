@@ -1,5 +1,8 @@
 from chatbotos.datasets import KEYWORDS
 from nltk.metrics import edit_distance
+from chatbotos.tokenizers import DefaultTokenizer
+from nltk.tokenize import sent_tokenize
+from nltk import pos_tag
 from itertools import chain
 
 def split_keywords(sentence: list[str]):
@@ -26,15 +29,25 @@ def extract_features(sentence: list[str]) -> dict[str, bool]:
 
   return sentence_features
 
+def most_similar_by_syntax(prompt: str, threshold: int) -> str:
+  sentence = DefaultTokenizer.tokenize(prompt)
+  keywords = set(chain(*KEYWORDS.values()))
 
-def syntax_check(sentence: list[str]):
-  THRESHOLD = 3
+  def most_similar(word):
+    similars = tuple((w, edit_distance(word, w)) for w in keywords)
+    similars = tuple(filter(lambda pair: pair[1] <= threshold, similars))
+    return min(similars, key = lambda pair: pair[1])[0] if len(similars) > 0 else word
 
-  similarities = []
-  for word in sentence:
-    for _, keywords in KEYWORDS.items():
-      sims: list[tuple] = [(w, edit_distance(word, w)) for w in keywords]
-      similarities += list(filter(lambda pair: pair[1] < THRESHOLD and pair[1] > 0, sims))
+  return ' '.join(word if word in keywords else most_similar(word) for word in sentence)
 
-  return similarities
-  # print("I don't understand \033[1m{}\033[0m did you mean \033[1m{}\033[0m?".format(word, pair[0].lower()))
+def segments(prompt: str) -> list[str]:
+  sentencies = []
+  for sentence in sent_tokenize(prompt):
+
+    tagged = pos_tag(DefaultTokenizer.tokenize(sentence))
+    regex = '|'.join([word for word, tag in tagged if tag == 'CC'])
+    if regex != '':
+      sentencies += sentence.split(regex)
+    else:
+      sentencies.append(sentence)
+  return sentencies

@@ -3,7 +3,7 @@ from nltk.classify import NaiveBayesClassifier as Classifier
 
 # Pretraining
 from chatbotos.tokenizers import DefaultTokenizer
-from chatbotos.pretrain import train_test_split, extract_features
+from chatbotos.pretrain import train_test_split, extract_features, most_similar_by_syntax, segments
 
 # Tasks
 from chatbotos.tasks.task import Task
@@ -71,12 +71,28 @@ class Eve:
       feature_set = [(extract_features(sentence), taskname) for (sentence, taskname) in sentences]
       self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
       self.__classifier__ = Classifier.train(self.__train_set__)
-
+      
 
   def classify_task(self, prompt) -> str:
     sentence = DefaultTokenizer.tokenize(prompt)
     predicted_class = self.__classifier__.classify(extract_features(sentence))
     return predicted_class
+
+  def try_predict(self, prompt: str) -> str:
+    predicted_prompt = most_similar_by_syntax(prompt, 2)
+
+    taskname = self.classify_task(predicted_prompt)
+    TaskType = TASKS.get(taskname)
+
+    if TaskType != None:
+      Task.reply('Did you mean ' + taskname + '?')
+      answer = Task.user()
+
+      if similarity('yes', answer.split(' ')) > .8: 
+        return TaskType
+    
+    return None
+
 
   def chat(self, input_stream = sys.stdin, output_stream = sys.stdout):
     stdin, stdout = sys.stdin, sys.stdout
@@ -114,27 +130,33 @@ class Eve:
     Task.reply(response)
 
     while True:
-      prompt: str = Task.user()
-      if prompt == 'exit': break
-      taskname = self.classify_task(prompt)
-      TaskType = TASKS.get(taskname)
+      user_input: str = Task.user()
+      if user_input == 'exit': break
 
-      if TaskType != None:
-        task = TaskType()
-        task.fill(prompt)
-        command = task.build()
+      prompts = segments(user_input)
 
-        Task.reply("Should i execute the \"{}\" command?".format(command))
-        answer = Task.user()
+      for prompt in prompts:
+        taskname = self.classify_task(prompt)
+        TaskType = TASKS.get(taskname)
 
-        if similarity('yes', answer.split(' ')) > .8: 
-          task.execute()
-      else:
-        Task.error('Unkown task "{}"'.format(taskname))
-        response = random.choice(rejection_responses)
-        Task.reply(response)
+        if TaskType == None:
+          TaskType = self.try_predict(prompt)
 
-      
+        if TaskType != None:
+          task = TaskType()
+          task.fill(prompt)
+          command = task.build()
+
+          Task.reply("Should i execute the \"{}\" command?".format(command))
+          answer = Task.user()
+
+          if similarity('yes', answer.split(' ')) > .8: 
+            task.execute()
+        else:
+          # Task.error('Unkown task "{}"'.format(taskname))
+          response = random.choice(rejection_responses)
+          Task.reply(response)
+
       response = random.choice(mid_responses)
       Task.reply(response)
 
