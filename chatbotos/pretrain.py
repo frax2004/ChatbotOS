@@ -4,7 +4,7 @@ from itertools import chain
 
 def split_keywords(sentence: list[str]):
   keywords = set(chain(*KEYWORDS.values()))
-  is_keyword = lambda w: w in keywords
+  is_keyword = lambda w: w.lower() in keywords
   return list((word, 'keyword' if is_keyword(word) else 'non-keyword') for word in sentence)
 
 
@@ -15,7 +15,7 @@ def train_test_split(dataset, pivot: float = .5):
 
 def extract_features(sentence: list[str]) -> dict[str, bool]:
   extract_features_word = lambda w: {
-    tag: bool(w in keywords) for (tag, keywords) in KEYWORDS.items()
+    tag: bool(w.lower() in keywords) for (tag, keywords) in KEYWORDS.items()
   }
   sentence_features: dict[str, bool] = dict.fromkeys(KEYWORDS.keys(), False)
 

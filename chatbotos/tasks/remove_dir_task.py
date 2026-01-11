@@ -1,5 +1,6 @@
 from chatbotos.tasks.task import Task
 import os
+import shutil as shell
 
 class RemoveDirTask(Task):
   def __init__(self):
@@ -55,3 +56,13 @@ class RemoveDirTask(Task):
       self['recursive'].field,
       self['directory'].field 
     )
+
+  def execute(self):
+    if self['recursive'].field == '/s':
+      shell.rmtree(self['directory'].field, ignore_errors=True)
+    else:
+      path = self['directory'].field
+      if os.path.exists(path) and os.path.isdir(path):
+        os.rmdir(self['directory'].field)
+      else:
+        Task.error('Directory to remove {} does not exist'.format(path))

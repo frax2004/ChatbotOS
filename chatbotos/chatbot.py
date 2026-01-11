@@ -1,10 +1,9 @@
 # NLTK
-from nltk.classify import NaiveBayesClassifier
+from nltk.classify import NaiveBayesClassifier as Classifier
 
 # Pretraining
-from chatbotos.tokenizers import SplitTokenizer
+from chatbotos.tokenizers import DefaultTokenizer
 from chatbotos.pretrain import train_test_split, extract_features
-from chatbotos.datasets import COMMANDS, tagged_commands
 
 # Tasks
 from chatbotos.tasks.task import Task
@@ -23,6 +22,7 @@ from chatbotos.tasks.rename_task import RenameTask
 import sys
 import os
 import random
+import pickle
 
 from chatbotos.utils import similarity
 
@@ -47,16 +47,36 @@ TASKS: dict[str, type[Task]] = {
 # Per più task, per determinare l'ordine si fa pos tagging per estrarre le piu frasi in un solo prompt
 class Eve:
   def __init__(self):
-    self.__tagged__ = {command['input'] : command['output'] for command in tagged_commands()}
-    sentences = [command['input'].split(' ') for command in COMMANDS]
-    feature_set = [(extract_features(sentence), ' '.join(sentence)) for sentence in sentences]
-    self.__train_set__, self.__test_set__ = train_test_split(feature_set, .75)
-    self.__classifier__ = NaiveBayesClassifier.train(self.__train_set__)
+
+    if os.path.exists('classifier.pickle'):
+      Task.debug("Creating Classifier...")
+      with open('classifier.pickle', 'rb') as file:
+        self.__classifier__ = pickle.load(file)
+      Task.debug("Classifier ready")
+
+    else: 
+      sentences: list[tuple] = []
+      for path in os.listdir('data\\commands\\'):
+        with open('data\\commands\\' + path, 'r') as file:
+          print(f'[START] Reading data\\commands\\{path}')
+          taskname = os.path.basename(path).upper()
+          
+          while True:
+            sents = file.readlines(1024)
+            if sents == []: break
+            sentences += [(line.split(' '), taskname) for line in sents]
+
+          print(f'[FINISH] data\\commands\\{path} Read')
+
+      feature_set = [(extract_features(sentence), taskname) for (sentence, taskname) in sentences]
+      self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
+      self.__classifier__ = Classifier.train(self.__train_set__)
+
 
   def classify_task(self, prompt) -> str:
-    sentence = SplitTokenizer.tokenize(prompt)
+    sentence = DefaultTokenizer.tokenize(prompt)
     predicted_class = self.__classifier__.classify(extract_features(sentence))
-    return self.__tagged__[predicted_class]
+    return predicted_class
 
   def chat(self, input_stream = sys.stdin, output_stream = sys.stdout):
     stdin, stdout = sys.stdin, sys.stdout
@@ -67,6 +87,14 @@ class Eve:
       'Hi there, how can i help you today?',
       'What can i do today for you?',
       'Welcome back user, what do we do?'
+    )
+
+    rejection_responses = (
+      "Sorry i didn't understand what to do",
+      "I don't understand the task",
+      "Be more precise",
+      "I can't do this",
+      "Sorry, i am not supposed to do this"
     )
 
     mid_responses = (
@@ -89,7 +117,6 @@ class Eve:
       prompt: str = Task.user()
       if prompt == 'exit': break
       taskname = self.classify_task(prompt)
-
       TaskType = TASKS.get(taskname)
 
       if TaskType != None:
@@ -101,7 +128,12 @@ class Eve:
         answer = Task.user()
 
         if similarity('yes', answer.split(' ')) > .8: 
-          os.system(command)
+          task.execute()
+      else:
+        Task.error('Unkown task "{}"'.format(taskname))
+        response = random.choice(rejection_responses)
+        Task.reply(response)
+
       
       response = random.choice(mid_responses)
       Task.reply(response)

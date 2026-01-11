@@ -1,6 +1,7 @@
 from chatbotos.tasks.task import Task
 import re
 import os
+import shutil as shell
 
 class MoveTask(Task):
   def __init__(self):
@@ -84,3 +85,14 @@ class MoveTask(Task):
       self['file name'].field,
       self['destination directory'].field
     )
+
+  def execute(self) -> None:
+    source_path = self['source directory'].field + '\\' + self['file name'].field
+    target_path = self['destination directory'].field
+
+    if not (os.path.exists(source_path) and os.path.isfile(source_path)):
+      Task.error('File to move "{}" does not exist'.format(source_path))
+    elif not (os.path.exists(target_path) and os.path.isdir(target_path)):
+      Task.error('Directory to move the file into "{}" does not exist'.format(target_path))
+    else:
+      shell.move(source_path, target_path)

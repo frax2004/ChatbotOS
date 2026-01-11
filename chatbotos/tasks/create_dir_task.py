@@ -53,7 +53,14 @@ class CreateDirTask(Task):
     )
   
   def build(self):
-    return r"mkdir {}\{}".format(
+    return "mkdir {}\\{}".format(
       self['destination directory'].field,
       self['directory'].field
     )
+
+  def execute(self):
+    path = self['destination directory'].field + '\\' + self['directory'].field
+    if os.path.exists(path) and os.path.isdir(path):
+      Task.error("Directory already exists")
+    else:
+      os.mkdir(path)

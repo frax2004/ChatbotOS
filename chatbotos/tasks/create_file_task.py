@@ -43,12 +43,20 @@ class CreateFileTask(Task):
         "i didn't understand the extension, can you specify one?",
         "can you specify an extension?"
       ),
+      rejection_responses = (
+        "i didn't understand the file extension, rewrite it.",
+        "write the file extension please"
+      ),
       matches = r"[a-zA-Z0-9_]*((\.[a-zA-Z0-9_])+)",
       mandatory = True
     )
     self['directory'] = Task.EntryInfo(
       acceptance_responses = (
         "letzgoski",
+      ),
+      rejection_responses = (
+        "i didn't understand the directory, rewrite it.",
+        "write the directory please"
       ),
       questions = (
         "i didn't understand the directory, do you want to specify one?",
@@ -63,3 +71,10 @@ class CreateFileTask(Task):
       self['file name'].field, 
       self['extension'].field
     )
+
+  def execute(self):
+    path = self['directory'].field + '\\' + self['file name'].field + '.' + self['extension'].field
+    if os.path.exists(path) and os.path.isfile(path):
+      Task.error("File already exists")
+    else:
+      with open(path, 'w') as file: pass

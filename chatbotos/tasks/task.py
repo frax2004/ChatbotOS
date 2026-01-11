@@ -1,9 +1,10 @@
-from chatbotos.tokenizers import SplitTokenizer
+from chatbotos.tokenizers import DefaultTokenizer
 from dataclasses import dataclass
 from abc import abstractmethod
 from nltk import pos_tag
 import random
 from chatbotos.utils import similarity
+import os
 
 class Task:
   @dataclass
@@ -16,12 +17,23 @@ class Task:
     matches: str | None = None
 
   @staticmethod
+  def error(rep: str = ""):
+    print("[\033[38;2;225;15;15mERROR\033[0m] @ \033[38;2;150;150;150m{}\033[0m << ".format(os.path.abspath('.')) + rep)
+
+  @staticmethod
+  def debug(rep: str = ""):
+    print("[\033[38;2;180;20;210mDEBUG\033[0m] @ \033[38;2;150;150;150m{}\033[0m << ".format(os.path.abspath('.')) + rep)
+
+  @staticmethod
   def reply(rep: str = ""):
-    print("[\033[38;2;255;215;0mEVE\033[0m] << " + rep)
+    print("[\033[38;2;255;215;0mEVE\033[0m] @ \033[38;2;150;150;150m{}\033[0m << ".format(os.path.abspath('.')) + rep)
 
   @staticmethod
   def user(prompt: str = ""):
-    return input('[\033[38;2;0;168;201mUSER\033[0m] >> ' + prompt)
+    return input('[\033[38;2;0;168;201mUSER\033[0m] @ \033[38;2;150;150;150m{}\033[0m >> '.format(os.path.abspath('.')) + prompt)
+
+  @abstractmethod
+  def execute(self) -> None: raise NotImplementedError('Task.execute() not implemented')
 
   @abstractmethod
   def build(self) -> str: ...
@@ -54,7 +66,7 @@ class Task:
     def mapper(pair): 
       return pair[0]
     
-    sentence = SplitTokenizer.tokenize(prompt)
+    sentence = DefaultTokenizer.tokenize(prompt)
     tagged_sentence = pos_tag(sentence, tagset = 'universal')
 
     inputs = {
@@ -80,7 +92,7 @@ class Task:
       prompt = Task.user()
 
       # Transform the prompt
-      sentence = SplitTokenizer.tokenize(prompt)
+      sentence = DefaultTokenizer.tokenize(prompt)
       tagged_sentence = pos_tag(sentence, tagset = 'universal')
 
       # Extract values from the prompt based on the predicates
