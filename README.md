@@ -5,6 +5,8 @@
   - Package python: nltk
   - Package python: gensim
   - Package python: matplotlib
+  - Package python: numpy
+  - Package python: seaborn
 ---
 
 ### Installazione
@@ -25,9 +27,11 @@ Installazione delle librerie python
 python -m pip install nltk
 python -m pip install gensim
 python -m pip install matplotlib
+python -m pip install numpy
+python -m pip install seaborn
 ```
 
-Per le dipendenze interne, occorre compilare i comandi: eseguire il file *compile_commands.py*
+Per le dipendenze interne (il dataset), occorre compilare i comandi: eseguire il file *compile_commands.py*, modificare la pipeline definita verso la fine per personalizzare solo le operazioni necessarie (nb: per la prima volta eseguirle tutte)
 
 ```bash
 python compile_commands.py
@@ -36,5 +40,4 @@ python compile_commands.py
 Questo genererà i dataset dei comandi e salverà sul file *classifier.pickle* il modello del classificatore bayesiano utilizzato dal chatbot.
 
 ### Esecuzione
-
 Eseguire il file python *main.py* per avviare una chat con **Eve**, enjoy!
