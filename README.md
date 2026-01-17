@@ -1,22 +1,40 @@
 # ChatbotOS
 
-### Tasks
-- **T1** **Creazione file**: Il sistema deve essere in grado di capire che la task richiesta è quella di creare un file, l'untente deve poter fornire la cartella di destinazione [opzionale] e almeno il nome del file con l'estensione se non è presente
-- **T2** **Cambiare directory**: Il sistema deve essere in grado di capire che la task richiesta è quella di cambiare la directory corrente in una specificata dall'utente (parametro obbligatorio). Il chatbot deve anche assicurarsi che la cartella obiettivo esista. Il sistema di dialogo infine, chiederà all'utente il permesso di creare la cartella Se essa non esista.
-- **T3** **Mostrare la cartella corrente**: Il sistema deve essere in grado di capire che la task richiesta è quella di mostrare la directory corrente. Il chatbot deve anche assicurarsi che la cartella obiettivo esista.
-- **T4** **Rinomiare la cartella corrente**: Il sistema deve essere in grado di capire che la task richiesta è quella di rinominare la cartella corrente in un nome specificato dall'utente. 
-  - Se la cartella non esiste, il chatbot chiederà il permesso di crearla.
-  - Se il nome di destinazione coincide con una cartella gia esistente allora il chatbot dovrà avvertire l'utente e richidere il nome di destinazione
-  - Se il percorso base di destinazione non coincide con il percorso base sorgente allora il chatbot dovrà avvertire l'utente e chiedere conferma di spostamento.
+### Requisiti
+- Python
+  - Package python: nltk
+  - Package python: gensim
+  - Package python: matplotlib
+---
+
+### Installazione
+Per i seguenti requisiti si consiglia l'ultizzo di un virtual environment tramite il comando
+
+```bash
+python -m venv <nome_venv>
+```
+per generare il virtual environment, e poi per attivarlo eseguire il comando
+
+```bash
+.\venv\bin\activate.bat
+```
 
 
+Installazione delle librerie python
+```bash
+python -m pip install nltk
+python -m pip install gensim
+python -m pip install matplotlib
+```
 
-#### T1: Creazione file
-`Frame`
+Per le dipendenze interne, occorre compilare i comandi: eseguire il file *compile_commands.py*
 
-|Campo|
-|-|
-|Nome del file|
-|Estensione del file|
-|[Directory]|
+```bash
+python compile_commands.py
+```
 
+Questo genererà i dataset dei comandi e salverà sul file *classifier.pickle* il modello del classificatore bayesiano utilizzato dal chatbot.
+
+### Esecuzione
+
+Eseguire il file python *main.py* per avviare una chat con **Eve**, enjoy!

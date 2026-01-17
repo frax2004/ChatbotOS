@@ -46,6 +46,25 @@ TASKS: dict[str, type[Task]] = {
 # la presenza di più task)
 # Per più task, per determinare l'ordine si fa pos tagging per estrarre le piu frasi in un solo prompt
 class Eve:
+
+  def __train__(self):
+    sentences: list[tuple] = []
+    for path in os.listdir('data\\commands\\'):
+      with open('data\\commands\\' + path, 'r') as file:
+        print(f'[START] Reading data\\commands\\{path}')
+        taskname = os.path.basename(path).upper()
+        
+        while True:
+          sents = file.readlines(1024)
+          if sents == []: break
+          sentences += [(line.split(' '), taskname) for line in sents]
+
+        print(f'[FINISH] data\\commands\\{path} Read')
+
+    feature_set = [(extract_features(sentence), taskname) for (sentence, taskname) in sentences]
+    self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
+    self.__classifier__ = Classifier.train(self.__train_set__)
+
   def __init__(self):
 
     if os.path.exists('classifier.pickle'):
@@ -54,24 +73,7 @@ class Eve:
         self.__classifier__ = pickle.load(file)
       Task.debug("Classifier ready")
 
-    else: 
-      sentences: list[tuple] = []
-      for path in os.listdir('data\\commands\\'):
-        with open('data\\commands\\' + path, 'r') as file:
-          print(f'[START] Reading data\\commands\\{path}')
-          taskname = os.path.basename(path).upper()
-          
-          while True:
-            sents = file.readlines(1024)
-            if sents == []: break
-            sentences += [(line.split(' '), taskname) for line in sents]
-
-          print(f'[FINISH] data\\commands\\{path} Read')
-
-      feature_set = [(extract_features(sentence), taskname) for (sentence, taskname) in sentences]
-      self.__train_set__, self.__test_set__ = train_test_split(feature_set, 1)
-      self.__classifier__ = Classifier.train(self.__train_set__)
-      
+    else: self.__train__()
 
   def classify_task(self, prompt) -> str:
     sentence = DefaultTokenizer.tokenize(prompt)
